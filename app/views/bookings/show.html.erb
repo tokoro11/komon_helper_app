@@ -8,3 +8,8 @@
 
   <%= button_to "Destroy this booking", @booking, method: :delete %>
 </div>
+<div>
+  <%= button_to "承認", approve_booking_path(@booking), method: :patch %>
+  <%= button_to "却下", reject_booking_path(@booking), method: :patch %>
+  <%= button_to "キャンセル", cancel_booking_path(@booking), method: :patch %>
+</div>
