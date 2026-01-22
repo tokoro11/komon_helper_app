@@ -12,32 +12,32 @@
   <% end %>
 
   <div>
-    <%= form.label :user_id, style: "display: block" %>
-    <%= form.text_field :user_id %>
+    <%= form.label :user_id, "顧問（ユーザー）" %><br>
+    <%= form.collection_select :user_id, User.order(:id), :id, :name, prompt: "選択してください" %>
   </div>
 
   <div>
-    <%= form.label :gym_id, style: "display: block" %>
-    <%= form.text_field :gym_id %>
+    <%= form.label :gym_id, "体育館" %><br>
+    <%= form.collection_select :gym_id, Gym.order(:id), :id, :name, prompt: "選択してください" %>
   </div>
 
   <div>
-    <%= form.label :start_time, style: "display: block" %>
-    <%= form.datetime_field :start_time %>
+    <%= form.label :start_time, "開始" %><br>
+    <%= form.datetime_local_field :start_time %>
   </div>
 
   <div>
-    <%= form.label :end_time, style: "display: block" %>
-    <%= form.datetime_field :end_time %>
+    <%= form.label :end_time, "終了" %><br>
+    <%= form.datetime_local_field :end_time %>
   </div>
 
   <div>
-    <%= form.label :status, style: "display: block" %>
-    <%= form.number_field :status %>
+    <%= form.label :status, "ステータス" %><br>
+    <%= form.select :status, Booking.statuses.keys.map { |k| [k, k] }, prompt: "選択してください" %>
   </div>
 
   <div>
-    <%= form.label :note, style: "display: block" %>
+    <%= form.label :note, "メモ" %><br>
     <%= form.text_area :note %>
   </div>
 
