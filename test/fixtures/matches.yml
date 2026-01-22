@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  gym: one
+  starts_at: 2026-01-22 23:35:18
+  team_a_id: 
+  team_b_id: 
+  note: MyText
+
+two:
+  gym: two
+  starts_at: 2026-01-22 23:35:18
+  team_a_id: 
+  team_b_id: 
+  note: MyText

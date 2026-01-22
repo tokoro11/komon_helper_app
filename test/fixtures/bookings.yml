@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  gym: one
+  start_time: 2026-01-22 23:35:01
+  end_time: 2026-01-22 23:35:01
+  status: 1
+  note: MyText
+
+two:
+  user: two
+  gym: two
+  start_time: 2026-01-22 23:35:01
+  end_time: 2026-01-22 23:35:01
+  status: 1
+  note: MyText
