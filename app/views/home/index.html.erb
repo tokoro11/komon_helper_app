@@ -1,7 +1,16 @@
 <h1>顧問ヘルパー</h1>
 <p>部活動の施設予約と試合予定を管理するアプリです。</p>
 
-<ul>
-  <li><%= link_to "体育館予約一覧", bookings_path %></li>
-  <li><%= link_to "試合予定一覧", "/matches" %></li>
-</ul>
+<div style="display: grid; gap: 12px; max-width: 520px;">
+  <div style="border: 1px solid #ddd; padding: 12px; border-radius: 8px;">
+    <h2 style="margin: 0 0 8px;">体育館予約</h2>
+    <p style="margin: 0 0 8px;">予約の作成・確認・承認/却下ができます。</p>
+    <%= link_to "予約一覧へ", bookings_path %>
+  </div>
+
+  <div style="border: 1px solid #ddd; padding: 12px; border-radius: 8px;">
+    <h2 style="margin: 0 0 8px;">試合予定</h2>
+    <p style="margin: 0 0 8px;">試合予定の作成・確認ができます。</p>
+    <%= link_to "試合一覧へ", matches_path %>
+  </div>
+</div>
