@@ -1,0 +1,41 @@
+<%= form_with(model: match) do |form| %>
+  <% if match.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(match.errors.count, "error") %> prohibited this match from being saved:</h2>
+      <ul>
+        <% match.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :team_a_id, "自チーム" %><br>
+    <%= form.collection_select :team_a_id, Team.order(:id), :id, :name, prompt: "選択してください" %>
+  </div>
+
+  <div>
+    <%= form.label :team_b_id, "対戦相手" %><br>
+    <%= form.collection_select :team_b_id, Team.order(:id), :id, :name, prompt: "選択してください" %>
+  </div>
+
+  <div>
+    <%= form.label :gym_id, "会場" %><br>
+    <%= form.collection_select :gym_id, Gym.order(:id), :id, :name, prompt: "選択してください" %>
+  </div>
+
+  <div>
+    <%= form.label :starts_at, "開始日時" %><br>
+    <%= form.datetime_local_field :starts_at %>
+  </div>
+
+  <div>
+    <%= form.label :note, "メモ" %><br>
+    <%= form.text_area :note %>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>
