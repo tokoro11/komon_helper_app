@@ -1,5 +1,5 @@
 class BookingsController < ApplicationController
-  before_action :set_booking, only: %i[ show edit update destroy ]
+  before_action :set_booking, only: %i[ show edit update destroy approve reject cancel ]
 
   # GET /bookings or /bookings.json
   def index
@@ -55,6 +55,21 @@ class BookingsController < ApplicationController
       format.html { redirect_to bookings_path, notice: "Booking was successfully destroyed.", status: :see_other }
       format.json { head :no_content }
     end
+  end
+
+    def approve
+    @booking.update!(status: :approved)
+    redirect_to @booking, notice: "承認しました"
+  end
+
+  def reject
+    @booking.update!(status: :rejected)
+    redirect_to @booking, notice: "却下しました"
+  end
+
+  def cancel
+    @booking.update!(status: :canceled)
+    redirect_to @booking, notice: "キャンセルしました"
   end
 
   private
