@@ -1,16 +1,35 @@
 <p style="color: green"><%= notice %></p>
 
-<% content_for :title, "Bookings" %>
+<h1>体育館予約一覧</h1>
 
-<h1>Bookings</h1>
+<p><%= link_to "予約を作成", new_booking_path %></p>
 
-<div id="bookings">
+<table style="width: 100%; border-collapse: collapse;">
+  <thead>
+    <tr>
+      <th style="border-bottom: 1px solid #ddd; text-align: left; padding: 8px;">顧問</th>
+      <th style="border-bottom: 1px solid #ddd; text-align: left; padding: 8px;">体育館</th>
+      <th style="border-bottom: 1px solid #ddd; text-align: left; padding: 8px;">開始</th>
+      <th style="border-bottom: 1px solid #ddd; text-align: left; padding: 8px;">終了</th>
+      <th style="border-bottom: 1px solid #ddd; text-align: left; padding: 8px;">ステータス</th>
+      <th style="border-bottom: 1px solid #ddd; padding: 8px;"></th>
+    </tr>
+  </thead>
+
+  <tbody>
   <% @bookings.each do |booking| %>
-    <%= render booking %>
-    <p>
-      <%= link_to "Show this booking", booking %>
-    </p>
+    <tr>
+      <td style="border-bottom: 1px solid #eee; padding: 8px;"><%= booking.user&.name %></td>
+      <td style="border-bottom: 1px solid #eee; padding: 8px;"><%= booking.gym&.name %></td>
+      <td style="border-bottom: 1px solid #eee; padding: 8px;"><%= booking.start_time&.strftime("%Y-%m-%d %H:%M") %></td>
+      <td style="border-bottom: 1px solid #eee; padding: 8px;"><%= booking.end_time&.strftime("%Y-%m-%d %H:%M") %></td>
+      <td style="border-bottom: 1px solid #eee; padding: 8px;">
+        <%= booking_status_badge(booking.status) %>
+      </td>
+      <td style="border-bottom: 1px solid #eee; padding: 8px;">
+        <%= link_to "詳細", booking_path(booking) %>
+      </td>
+    </tr>
   <% end %>
-</div>
-
-<%= link_to "New booking", new_booking_path %>
+</tbody>
+</table>

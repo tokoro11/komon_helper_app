@@ -33,7 +33,7 @@
 
   <div>
     <%= form.label :status, "ステータス" %><br>
-    <%= form.select :status, Booking.statuses.keys.map { |k| [k, k] }, prompt: "選択してください" %>
+    <%= form.select :status, Booking::STATUS_LABELS.map { |k, v| [v, k] } %>
   </div>
 
   <div>

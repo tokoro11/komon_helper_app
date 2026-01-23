@@ -1,16 +1,31 @@
 <p style="color: green"><%= notice %></p>
 
-<% content_for :title, "Matches" %>
+<h1>試合予定一覧</h1>
 
-<h1>Matches</h1>
+<p><%= link_to "試合予定を作成", new_match_path %></p>
 
-<div id="matches">
-  <% @matches.each do |match| %>
-    <%= render match %>
-    <p>
-      <%= link_to "Show this match", match %>
-    </p>
-  <% end %>
-</div>
+<table style="width: 100%; border-collapse: collapse;">
+  <thead>
+    <tr>
+      <th style="border-bottom: 1px solid #ddd; text-align: left; padding: 8px;">日時</th>
+      <th style="border-bottom: 1px solid #ddd; text-align: left; padding: 8px;">自チーム</th>
+      <th style="border-bottom: 1px solid #ddd; text-align: left; padding: 8px;">対戦相手</th>
+      <th style="border-bottom: 1px solid #ddd; text-align: left; padding: 8px;">会場</th>
+      <th style="border-bottom: 1px solid #ddd; padding: 8px;"></th>
+    </tr>
+  </thead>
 
-<%= link_to "New match", new_match_path %>
+  <tbody>
+    <% @matches.each do |match| %>
+      <tr>
+        <td style="border-bottom: 1px solid #eee; padding: 8px;">
+          <%= match.starts_at&.in_time_zone("Tokyo")&.strftime("%Y-%m-%d %H:%M") %>
+        </td>
+        <td style="border-bottom: 1px solid #eee; padding: 8px;"><%= match.team_a&.name %></td>
+        <td style="border-bottom: 1px solid #eee; padding: 8px;"><%= match.team_b&.name %></td>
+        <td style="border-bottom: 1px solid #eee; padding: 8px;"><%= match.gym&.name %></td>
+        <td style="border-bottom: 1px solid #eee; padding: 8px;"><%= link_to "詳細", match_path(match) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

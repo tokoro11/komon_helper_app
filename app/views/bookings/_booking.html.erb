@@ -1,32 +1,31 @@
 <div id="<%= dom_id booking %>">
   <p>
-    <strong>User:</strong>
-    <%= booking.user_id %>
+    <strong>顧問：</strong>
+    <%= booking.user&.name %>
   </p>
 
   <p>
-    <strong>Gym:</strong>
-    <%= booking.gym_id %>
+    <strong>体育館：</strong>
+    <%= booking.gym&.name %>
   </p>
 
   <p>
-    <strong>Start time:</strong>
-    <%= booking.start_time %>
+    <strong>開始時間：</strong>
+    <%= booking.start_time&.strftime("%Y-%m-%d %H:%M") %>
   </p>
 
   <p>
-    <strong>End time:</strong>
-    <%= booking.end_time %>
+    <strong>終了時間：</strong>
+    <%= booking.end_time&.strftime("%Y-%m-%d %H:%M") %>
   </p>
 
   <p>
-    <strong>Status:</strong>
-    <%= booking.status %>
+    <strong>ステータス：</strong>
+    <%= booking_status_badge(booking.status) %>
   </p>
 
   <p>
-    <strong>Note:</strong>
-    <%= booking.note %>
+    <strong>メモ：</strong>
+    <%= booking.note.presence || "なし" %>
   </p>
-
 </div>

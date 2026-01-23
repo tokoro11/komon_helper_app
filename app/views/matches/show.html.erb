@@ -3,8 +3,9 @@
 <%= render @match %>
 
 <div>
-  <%= link_to "Edit this match", edit_match_path(@match) %> |
-  <%= link_to "Back to matches", matches_path %>
+  <%= link_to "編集", edit_match_path(@match) %> |
+  <%= link_to "一覧へ戻る", matches_path %>
 
-  <%= button_to "Destroy this match", @match, method: :delete %>
+  <%= button_to "削除", @match, method: :delete, data: { turbo_confirm: "削除してよいですか？" } %>
 </div>
+

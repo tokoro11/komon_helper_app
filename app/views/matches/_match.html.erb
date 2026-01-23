@@ -1,27 +1,26 @@
 <div id="<%= dom_id match %>">
   <p>
-    <strong>Gym:</strong>
-    <%= match.gym_id %>
+    <strong>日時：</strong>
+    <%= match.starts_at&.strftime("%Y-%m-%d %H:%M") %>
   </p>
 
   <p>
-    <strong>Starts at:</strong>
-    <%= match.starts_at %>
+    <strong>自チーム：</strong>
+    <%= match.team_a&.name %>
   </p>
 
   <p>
-    <strong>Team a:</strong>
-    <%= match.team_a_id %>
+    <strong>対戦相手：</strong>
+    <%= match.team_b&.name %>
   </p>
 
   <p>
-    <strong>Team b:</strong>
-    <%= match.team_b_id %>
+    <strong>会場：</strong>
+    <%= match.gym&.name %>
   </p>
 
   <p>
-    <strong>Note:</strong>
-    <%= match.note %>
+    <strong>メモ：</strong>
+    <%= match.note.presence || "なし" %>
   </p>
-
 </div>
