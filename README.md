@@ -1,24 +1,105 @@
 # README
+# 顧問ヘルパー（Komon Helper App）
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## 概要
+顧問ヘルパーは、部活動の顧問・生徒が体育館の利用状況や試合予定を
+すぐに確認・共有できるようにするための管理アプリです。
 
-Things you may want to cover:
+体育館の使用時間変更や練習試合の急な予定変更があっても、
+顧問・生徒が同じ情報をリアルタイムで確認できることを目的としています。
 
-* Ruby version
+また、自校の体育館が使用できない場合の代替施設の予約管理や、
+練習試合の日程管理を一元化することで、
+部活動運営の負担を軽減します。
 
-* System dependencies
+## 主な機能
 
-* Configuration
+### 1. 体育館予約管理（Booking）
+- 体育館の利用日時を予約として登録
+- 顧問単位で予約を管理
+- 開始時間・終了時間・メモの登録が可能
 
-* Database creation
+### 2. 承認フロー（ステータス管理）
+- 予約は `pending（申請中）` → `approved（承認）` / `rejected（却下）` / `canceled（キャンセル）` の状態で管理
+- 予約詳細画面からワンクリックで承認・却下・キャンセルが可能
 
-* Database initialization
+### 3. 試合予定管理（Match）
+- 自チームと対戦相手チーム、会場、日時を登録
+- 練習試合・公式戦の予定を一覧で確認可能
 
-* How to run the test suite
+### 4. ホーム画面・ナビゲーション
+- トップページから予約一覧・試合一覧へすぐに遷移可能
+- 全ページ共通のヘッダーで直感的に操作できる構成
 
-* Services (job queues, cache servers, search engines, etc.)
+## ER図
 
-* Deployment instructions
+![ER図](docs/er.png)
 
-* ...
+## 使用技術
+
+- Ruby 3.x
+- Ruby on Rails 7
+- PostgreSQL
+- HTML / CSS（簡易スタイリング）
+- Git / GitHub（featureブランチ + Pull Request 運用）
+
+## セットアップ手順
+
+```bash
+# リポジトリをクローン
+git clone https://github.com/tokoro11/komon_helper_app.git
+cd komon_helper_app
+
+# 依存関係のインストール
+bundle install
+
+# データベース作成
+rails db:create
+rails db:migrate
+rails db:seed
+
+# サーバー起動
+rails s
+
+## 設計のポイント
+
+### 1. 予約を中心とした業務フロー設計
+体育館予約（Booking）を起点に、
+`申請（pending）→ 承認（approved）→ 却下（rejected）→ キャンセル（canceled）`
+という実際の部活動運営に近いフローを
+enumによる状態管理で表現しています。
+
+### 2. 顧問・チーム・施設・試合の関係性を明確化
+- User（顧問）が Team に所属
+- Booking は User と Gym に紐づく
+- Match は Team A / Team B / Gym に紐づく
+
+という形で、ER図ベースに責務を分離し、
+拡張しやすい構成にしています。
+
+### 3. 実務を意識したGit運用
+機能単位で feature ブランチを作成し、
+Pull Request を作成して develop ブランチにマージする
+実務を想定した開発フローで進めています。
+
+## 今後の拡張（v2構想）
+
+### 練習試合マッチング機能（レベル1）
+
+練習試合の相手校を探すために、以下のようなマッチング機能の追加を想定しています。
+
+- 試合募集（MatchOffer）
+  - 日時・会場・カテゴリ（男女・学年など）を指定して募集を作成
+- 申請（MatchRequest）
+  - 他校が募集に対して申請
+- 承認
+  - 承認された場合、自動的に Match が生成される
+
+これにより、
+
+「募集 → 申請 → 承認 → 試合予定確定」
+
+という流れをアプリ上で完結できる構成を目指しています。
+
+将来的にはログイン機能や権限管理（顧問 / 管理者 / 生徒）も追加し、
+より実運用に近い形へ発展させる予定です。
