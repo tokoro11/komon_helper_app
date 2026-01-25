@@ -1,0 +1,31 @@
+<h1>募集 詳細</h1>
+
+<p><strong>日付：</strong><%= @match_listing.match_date %></p>
+<p><strong>時間：</strong><%= @match_listing.start_time.strftime("%H:%M") %> - <%= @match_listing.end_time.strftime("%H:%M") %></p>
+
+<p><strong>種別：</strong>
+  <%= @match_listing.gender_category == "boys" ? "男子" : "女子" %>
+</p>
+
+<p><strong>カテゴリ：</strong>
+  <%= case @match_listing.school_category
+      when "junior_high" then "中学"
+      when "high_school" then "高校"
+      when "university" then "大学"
+      else @match_listing.school_category
+      end %>
+</p>
+
+<p><strong>体育館：</strong><%= @match_listing.gym&.name %></p>
+<% if @match_listing.gym&.address.present? %>
+  <p><strong>住所：</strong><%= @match_listing.gym.address %></p>
+  <p>
+    <%= link_to "GoogleMapで見る", "https://www.google.com/maps/search/?api=1&query=#{ERB::Util.url_encode(@match_listing.gym.address)}", target: "_blank", rel: "noopener" %>
+  </p>
+<% end %>
+
+<p><strong>備考：</strong><br><%= simple_format(@match_listing.notes) %></p>
+
+<p style="margin-top: 16px;">
+  <%= link_to "一覧に戻る", match_listings_path %>
+</p>

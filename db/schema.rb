@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_01_22_143518) do
+ActiveRecord::Schema[7.2].define(version: 2026_01_23_120639) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -32,6 +32,22 @@ ActiveRecord::Schema[7.2].define(version: 2026_01_22_143518) do
     t.string "address"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "match_listings", force: :cascade do |t|
+    t.bigint "owner_id", null: false
+    t.bigint "gym_id", null: false
+    t.date "match_date", null: false
+    t.time "start_time", null: false
+    t.time "end_time", null: false
+    t.integer "gender_category", null: false
+    t.integer "school_category", null: false
+    t.integer "status", default: 0, null: false
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["gym_id"], name: "index_match_listings_on_gym_id"
+    t.index ["owner_id"], name: "index_match_listings_on_owner_id"
   end
 
   create_table "matches", force: :cascade do |t|
@@ -65,6 +81,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_01_22_143518) do
 
   add_foreign_key "bookings", "gyms"
   add_foreign_key "bookings", "users"
+  add_foreign_key "match_listings", "gyms"
+  add_foreign_key "match_listings", "users", column: "owner_id"
   add_foreign_key "matches", "gyms"
   add_foreign_key "matches", "teams", column: "team_a_id"
   add_foreign_key "matches", "teams", column: "team_b_id"

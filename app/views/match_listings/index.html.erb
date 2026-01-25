@@ -1,0 +1,37 @@
+<h1>練習試合 募集一覧</h1>
+
+<p>
+  <%= link_to "募集を作成", new_match_listing_path %>
+</p>
+
+<table style="width: 100%; border-collapse: collapse;">
+  <thead>
+    <tr>
+      <th style="border-bottom: 1px solid #ddd; padding: 8px;">日付</th>
+      <th style="border-bottom: 1px solid #ddd; padding: 8px;">時間</th>
+      <th style="border-bottom: 1px solid #ddd; padding: 8px;">種別</th>
+      <th style="border-bottom: 1px solid #ddd; padding: 8px;">カテゴリ</th>
+      <th style="border-bottom: 1px solid #ddd; padding: 8px;">体育館</th>
+      <th style="border-bottom: 1px solid #ddd; padding: 8px;"></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @match_listings.each do |listing| %>
+      <tr>
+        <td style="border-bottom: 1px solid #eee; padding: 8px;"><%= listing.match_date %></td>
+        <td style="border-bottom: 1px solid #eee; padding: 8px;"><%= listing.start_time.strftime("%H:%M") %> - <%= listing.end_time.strftime("%H:%M") %></td>
+        <td style="border-bottom: 1px solid #eee; padding: 8px;"><%= listing.gender_category == "boys" ? "男子" : "女子" %></td>
+        <td style="border-bottom: 1px solid #eee; padding: 8px;">
+          <%= case listing.school_category
+              when "junior_high" then "中学"
+              when "high_school" then "高校"
+              when "university" then "大学"
+              else listing.school_category
+              end %>
+        </td>
+        <td style="border-bottom: 1px solid #eee; padding: 8px;"><%= listing.gym&.name %></td>
+        <td style="border-bottom: 1px solid #eee; padding: 8px;"><%= link_to "詳細", match_listing_path(listing) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
