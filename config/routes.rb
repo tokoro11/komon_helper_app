@@ -12,7 +12,14 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :match_listings, only: %i[index show new create]
+  resources :match_listings, only: %i[index show new create] do
+    resources :match_applications, only: %i[create index] do
+      member do
+        patch :approve
+        patch :reject
+      end
+    end
+  end
 
   get "up" => "rails/health#show", as: :rails_health_check
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker

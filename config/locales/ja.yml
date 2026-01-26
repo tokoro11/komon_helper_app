@@ -1,0 +1,14 @@
+ja:
+  activerecord:
+    attributes:
+      match_listing:
+        status:
+          open: "受付中"
+          closed: "受付終了"
+          canceled: "中止"
+      match_application:
+        status:
+          pending: "未処理"
+          approved: "承認済み"
+          rejected: "却下"
+          canceled: "キャンセル"

@@ -29,6 +29,12 @@
 </header>
 
 <main style="padding: 16px;">
+  <% flash.each do |key, message| %>
+    <div style="margin-bottom: 12px; padding: 10px; border: 1px solid #ddd;">
+      <%= message %>
+    </div>
+  <% end %>
+
   <%= yield %>
 </main>
 

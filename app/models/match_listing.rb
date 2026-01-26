@@ -1,13 +1,18 @@
 class MatchListing < ApplicationRecord
   belongs_to :owner, class_name: "User"
   belongs_to :gym
+  has_many :match_applications, dependent: :destroy
 
-  enum gender_category: { boys: 0, girls: 1 }
-  enum school_category: { junior_high: 0, high_school: 1, university: 2 }
-  enum status: { open: 0, closed: 1, canceled: 2 }
+  enum :gender_category, { boys: 0, girls: 1 }
+  enum :school_category, { junior_high: 0, high_school: 1, university: 2 }
+  enum :status, { open: 0, closed: 1, canceled: 2 }
 
   validates :match_date, :start_time, :end_time, :gender_category, :school_category, :status, presence: true
   validate :end_time_after_start_time
+
+  has_one :match, dependent: :destroy
+  has_many :match_applications, dependent: :destroy
+  belongs_to :owner, class_name: "User"
 
   private
 
