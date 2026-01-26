@@ -1,0 +1,41 @@
+ja:
+  activerecord:
+    models:
+      match_listing: "練習試合募集"
+      gym: "体育館"
+
+    attributes:
+      gym:
+        name: "体育館名"
+        address: "地域"
+
+      match_listing:
+        gym: "体育館"
+        gym_name: "体育館"
+        gym_address: "地域"
+        match_date: "試合日"
+        start_time: "開始時間"
+        end_time: "終了時間"
+        gender_category: "男女区分"
+        school_category: "カテゴリー"
+        notes: "備考"
+        status:
+          open: "受付中"
+          closed: "受付終了"
+          canceled: "中止"
+
+      match_application:
+        applicant: "申請者"
+        applicant_id: "申請者"
+        status:
+          pending: "未処理"
+          approved: "承認済み"
+          rejected: "却下"
+          canceled: "キャンセル"
+
+  enums:
+    user:
+      role:
+        komon: "顧問"
+        coach: "コーチ"
+        admin: "管理者"

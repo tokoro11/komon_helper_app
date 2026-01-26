@@ -13,4 +13,48 @@
     <p style="margin: 0 0 8px;">試合予定の作成・確認ができます。</p>
     <%= link_to "試合一覧へ", matches_path %>
   </div>
+
+  <div style="border: 1px solid #ddd; padding: 12px; border-radius: 8px;">
+    <h2 style="margin: 0 0 8px;">試合マッチング</h2>
+    <p style="margin: 0 0 8px;">
+      練習試合の募集・申請・承認を行い、対戦カードを自動生成します。
+    </p>
+
+    <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+      <%= link_to "マッチング募集一覧へ", match_listings_path %>
+      <%= link_to "練習試合を募集する", new_match_listing_path,
+                  style: "padding: 4px 10px; border: 1px solid #333; border-radius: 6px; text-decoration: none;" %>
+
+      <% if @pending_applications_count.to_i > 0 %>
+        <span style="padding: 2px 8px; border: 1px solid #ddd; border-radius: 999px;">
+          承認待ち <strong><%= @pending_applications_count %></strong> 件
+        </span>
+      <% else %>
+        <span style="color: #666; font-size: 13px;">承認待ちなし</span>
+      <% end %>
+    </div>
+
+    <% if @pending_listings.present? %>
+      <div style="margin-top: 10px;">
+        <div style="font-size: 13px; color: #666; margin-bottom: 6px;">
+          承認が必要な募集
+        </div>
+
+        <ul style="margin: 0; padding-left: 18px;">
+          <% @pending_listings.limit(3).each do |listing| %>
+            <li>
+              <%= link_to "#{listing.match_date} #{listing.start_time.strftime('%H:%M')} の承認一覧へ",
+                          match_listing_match_applications_path(listing) %>
+            </li>
+          <% end %>
+        </ul>
+
+        <% if @pending_listings.size > 3 %>
+          <div style="margin-top: 6px; font-size: 12px; color: #666;">
+            ※ 直近3件のみ表示
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
 </div>
