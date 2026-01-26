@@ -13,8 +13,14 @@
 
 <%= form_with model: @match_listing, local: true do |f| %>
   <div style="margin-bottom: 12px;">
-    <%= f.label :gym_id, "体育館" %><br>
-    <%= f.collection_select :gym_id, Gym.all, :id, :name, { prompt: "選択してください" }, { style: "width: 300px;" } %>
+    <%= f.label :gym_name, "体育館" %><br>
+    <%= f.text_field :gym_name, placeholder: "例：〇〇市総合体育館", style: "width: 300px;" %>
+  </div>
+
+  <!-- ★追加：地域（住所） -->
+  <div style="margin-bottom: 12px;">
+    <%= f.label :gym_address, "地域（住所）" %><br>
+    <%= f.text_field :gym_address, placeholder: "例：東京都渋谷区 / 横浜市 など", style: "width: 300px;" %>
   </div>
 
   <div style="margin-bottom: 12px;">

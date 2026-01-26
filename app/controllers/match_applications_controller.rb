@@ -6,8 +6,13 @@ class MatchApplicationsController < ApplicationController
   def create
     return redirect_to match_listing_path(@match_listing), alert: "この募集は受付終了です" unless @match_listing.open?
 
+    # ★追加：自分が作った募集には申請できない
+    if @match_listing.owner == current_user
+      return redirect_to match_listing_path(@match_listing), alert: "自分が作った募集には申請できません"
+    end
+
     @application = @match_listing.match_applications.new(match_application_params)
-    @application.applicant = User.find(3) # 応募者固定（今のテスト用）
+    @application.applicant = current_user
     @application.status = :pending
 
     if @application.save
@@ -85,8 +90,9 @@ class MatchApplicationsController < ApplicationController
   end
 
   def authorize_owner!
-    return if @match_listing.owner == User.first # ログイン未実装の暫定
-    redirect_to match_listing_path(@match_listing), alert: "権限がありません"
+    unless @match_listing.owner == current_user
+      redirect_to match_listing_path(@match_listing), alert: "権限がありません"
+    end
   end
 
   def match_application_params

@@ -78,6 +78,7 @@ GEM
       public_suffix (>= 2.0.2, < 8.0)
     ast (2.4.3)
     base64 (0.3.0)
+    bcrypt (3.1.21)
     benchmark (0.5.0)
     bigdecimal (4.0.1)
     bindex (0.8.1)
@@ -103,6 +104,15 @@ GEM
     debug (1.11.1)
       irb (~> 1.10)
       reline (>= 0.3.8)
+    devise (5.0.0)
+      bcrypt (~> 3.0)
+      orm_adapter (~> 0.1)
+      railties (>= 7.0)
+      responders
+      warden (~> 1.2.3)
+    devise-i18n (1.15.0)
+      devise (>= 4.9.0)
+      rails-i18n
     drb (2.2.3)
     erb (4.0.4)
       cgi (>= 0.3.3)
@@ -125,6 +135,18 @@ GEM
       actionview (>= 7.0.0)
       activesupport (>= 7.0.0)
     json (2.18.0)
+    kaminari (1.2.2)
+      activesupport (>= 4.1.0)
+      kaminari-actionview (= 1.2.2)
+      kaminari-activerecord (= 1.2.2)
+      kaminari-core (= 1.2.2)
+    kaminari-actionview (1.2.2)
+      actionview
+      kaminari-core (= 1.2.2)
+    kaminari-activerecord (1.2.2)
+      activerecord
+      kaminari-core (= 1.2.2)
+    kaminari-core (1.2.2)
     language_server-protocol (3.17.0.5)
     lint_roller (1.1.0)
     logger (1.7.0)
@@ -168,6 +190,7 @@ GEM
       racc (~> 1.4)
     nokogiri (1.18.10-x86_64-linux-musl)
       racc (~> 1.4)
+    orm_adapter (0.5.0)
     parallel (1.27.0)
     parser (3.3.10.1)
       ast (~> 2.4.1)
@@ -219,6 +242,9 @@ GEM
     rails-html-sanitizer (1.6.2)
       loofah (~> 2.21)
       nokogiri (>= 1.15.7, != 1.16.7, != 1.16.6, != 1.16.5, != 1.16.4, != 1.16.3, != 1.16.2, != 1.16.1, != 1.16.0.rc1, != 1.16.0)
+    rails-i18n (7.0.10)
+      i18n (>= 0.7, < 2)
+      railties (>= 6.0.0, < 8)
     railties (7.2.3)
       actionpack (= 7.2.3)
       activesupport (= 7.2.3)
@@ -231,6 +257,10 @@ GEM
       zeitwerk (~> 2.6)
     rainbow (3.1.1)
     rake (13.3.1)
+    ransack (4.4.1)
+      activerecord (>= 7.2)
+      activesupport (>= 7.2)
+      i18n
     rdoc (7.1.0)
       erb
       psych (>= 4.0.0)
@@ -238,6 +268,9 @@ GEM
     regexp_parser (2.11.3)
     reline (0.6.3)
       io-console (~> 0.5)
+    responders (3.2.0)
+      actionpack (>= 7.0)
+      railties (>= 7.0)
     rexml (3.4.4)
     rubocop (1.82.1)
       json (~> 2.3)
@@ -299,6 +332,8 @@ GEM
       unicode-emoji (~> 4.1)
     unicode-emoji (4.2.0)
     useragent (0.16.11)
+    warden (1.2.9)
+      rack (>= 2.0.9)
     web-console (4.2.1)
       actionview (>= 6.0.0)
       activemodel (>= 6.0.0)
@@ -330,12 +365,17 @@ DEPENDENCIES
   brakeman
   capybara
   debug
+  devise (~> 5.0)
+  devise-i18n
   error_highlight (>= 0.4.0)
   importmap-rails
   jbuilder
+  kaminari
   pg (~> 1.1)
   puma (>= 5.0)
   rails (~> 7.2.3)
+  rails-i18n
+  ransack
   rubocop-rails-omakase
   selenium-webdriver
   sprockets-rails

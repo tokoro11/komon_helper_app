@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_01_25_124350) do
+ActiveRecord::Schema[7.2].define(version: 2026_01_26_120905) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -70,7 +70,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_01_25_124350) do
     t.text "note"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "match_listing_id", null: false
+    t.bigint "match_listing_id"
     t.index ["gym_id"], name: "index_matches_on_gym_id"
     t.index ["match_listing_id"], name: "index_matches_on_match_listing_id", unique: true
     t.index ["team_a_id"], name: "index_matches_on_team_a_id"
@@ -84,12 +84,18 @@ ActiveRecord::Schema[7.2].define(version: 2026_01_25_124350) do
   end
 
   create_table "users", force: :cascade do |t|
-    t.bigint "team_id", null: false
+    t.bigint "team_id"
     t.string "name"
-    t.string "email"
-    t.integer "role"
+    t.string "email", default: "", null: false
+    t.integer "role", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "encrypted_password", default: "", null: false
+    t.string "reset_password_token"
+    t.datetime "reset_password_sent_at"
+    t.datetime "remember_created_at"
+    t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["team_id"], name: "index_users_on_team_id"
   end
 

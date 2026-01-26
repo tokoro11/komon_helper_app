@@ -1,4 +1,8 @@
 Rails.application.routes.draw do
+  devise_for :users
+  resource :profile, only: [:edit, :update]
+
+
   root "home#index"
   get "home/index"
 
@@ -12,7 +16,7 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :match_listings, only: %i[index show new create] do
+  resources :match_listings, only: %i[index show new create edit update destroy] do
     resources :match_applications, only: %i[create index] do
       member do
         patch :approve

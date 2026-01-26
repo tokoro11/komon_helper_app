@@ -20,9 +20,10 @@
     <%= form.collection_select :team_b_id, Team.order(:id), :id, :name, prompt: "選択してください" %>
   </div>
 
+  <!-- ★ここだけ変更：会場を自由入力 -->
   <div>
-    <%= form.label :gym_id, "会場" %><br>
-    <%= form.collection_select :gym_id, Gym.order(:id), :id, :name, prompt: "選択してください" %>
+    <%= form.label :gym_name, "会場" %><br>
+    <%= form.text_field :gym_name, placeholder: "例：第一体育館" %>
   </div>
 
   <div>
