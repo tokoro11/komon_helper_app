@@ -21,10 +21,22 @@
         <td style="border-bottom: 1px solid #eee; padding: 8px;">
           <%= match.starts_at&.in_time_zone("Tokyo")&.strftime("%Y-%m-%d %H:%M") %>
         </td>
-        <td style="border-bottom: 1px solid #eee; padding: 8px;"><%= match.team_a&.name %></td>
-        <td style="border-bottom: 1px solid #eee; padding: 8px;"><%= match.team_b&.name %></td>
-        <td style="border-bottom: 1px solid #eee; padding: 8px;"><%= match.gym&.name %></td>
-        <td style="border-bottom: 1px solid #eee; padding: 8px;"><%= link_to "詳細", match_path(match) %></td>
+
+        <td style="border-bottom: 1px solid #eee; padding: 8px;">
+          <%= match.team_a_name.presence || "未設定" %>
+        </td>
+
+        <td style="border-bottom: 1px solid #eee; padding: 8px;">
+          <%= match.team_b_name.presence || "未設定" %>
+        </td>
+
+        <td style="border-bottom: 1px solid #eee; padding: 8px;">
+          <%= match.gym&.name || "未設定" %>
+        </td>
+
+        <td style="border-bottom: 1px solid #eee; padding: 8px;">
+          <%= link_to "詳細", match_path(match) %>
+        </td>
       </tr>
     <% end %>
   </tbody>

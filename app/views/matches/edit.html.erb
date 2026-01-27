@@ -1,12 +1,12 @@
-<% content_for :title, "Editing match" %>
+<% content_for :title, "予定を編集" %>
 
-<h1>Editing match</h1>
+<h1>予定を編集</h1>
 
 <%= render "form", match: @match %>
 
 <br>
 
 <div>
-  <%= link_to "Show this match", @match %> |
-  <%= link_to "Back to matches", matches_path %>
+  <%= link_to "詳細を見る", @match %> |
+  <%= link_to "一覧に戻る", matches_path %>
 </div>

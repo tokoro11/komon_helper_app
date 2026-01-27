@@ -4,7 +4,7 @@ class Gym < ApplicationRecord
   has_many :match_listings, dependent: :destroy
 
   validates :name, presence: true
-  validates :address, presence: true
+  # validates :address, presence: true  ← ★消す（予定作成で不要なため）
 
   def self.ransackable_attributes(auth_object = nil)
     %w[name address]

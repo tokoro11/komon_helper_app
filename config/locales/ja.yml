@@ -2,7 +2,10 @@ ja:
   activerecord:
     models:
       match_listing: "練習試合募集"
+      match_application: "申請"
+      match: "試合"
       gym: "体育館"
+      team: "チーム"
       user: "ユーザー"
 
     attributes:
@@ -20,19 +23,20 @@ ja:
         gender_category: "男女区分"
         school_category: "カテゴリー"
         notes: "備考"
-        status:
-          open: "受付中"
-          closed: "受付終了"
-          canceled: "中止"
+        status: "募集状況"
 
       match_application:
         applicant: "申請者"
         applicant_id: "申請者"
-        status:
-          pending: "未処理"
-          approved: "承認済み"
-          rejected: "却下"
-          canceled: "キャンセル"
+        message: "メッセージ"
+        status: "ステータス"
+
+      match:
+        team_a_name: "自チーム"
+        team_b_name: "対戦相手"
+        gym_name: "会場"
+        starts_at: "開始日時"
+        note: "メモ"
 
       user:
         name: "名前"
@@ -45,6 +49,26 @@ ja:
         coach: "コーチ"
         admin: "管理者"
 
+    match_listing:
+      gender_category:
+        boys: "男子"
+        girls: "女子"
+      school_category:
+        junior_high: "中学"
+        high_school: "高校"
+        university: "大学"
+      status:
+        open: "受付中"
+        closed: "受付終了"
+        canceled: "中止"
+
+    match_application:
+      status:
+        pending: "未処理"
+        approved: "承認済み"
+        rejected: "却下"
+        canceled: "キャンセル"
+
   errors:
     messages:
       blank: "を入力してください"
@@ -52,5 +76,5 @@ ja:
 
   helpers:
     submit:
-      update: "更新する"
       create: "登録する"
+      update: "更新する"
