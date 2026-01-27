@@ -2,8 +2,20 @@ class MatchListingsController < ApplicationController
   before_action :set_match_listing, only: %i[show edit update destroy]
   before_action :authorize_owner!, only: %i[edit update destroy]
 
+  # ✅ 所属未設定ならプロフィールへ（募集の作成/編集だけ）
+  before_action :require_affiliation!, only: %i[new create edit update]
+
   def index
-    @q = MatchListing.includes(:gym).references(:gym).ransack(params[:q])
+    now = Time.zone.now
+    today = now.to_date
+    now_time = now.strftime("%H:%M:%S")
+
+    base = MatchListing.where(status: :open)
+                       .where("match_date > ? OR (match_date = ? AND end_time > ?)", today, today, now_time)
+                       .includes(:gym, :owner)
+                       .references(:gym)
+
+    @q = base.ransack(params[:q])
     @q.sorts = ["match_date asc", "start_time asc"] if @q.sorts.empty?
     @match_listings = @q.result(distinct: true).page(params[:page]).per(20)
   end
@@ -101,7 +113,7 @@ class MatchListingsController < ApplicationController
     n = name.to_s.strip
     a = address.to_s.strip
 
-    # ★体育館名も住所も必須
+    # 体育館名も住所も必須
     return nil if n.blank? || a.blank?
 
     gym = Gym.find_or_initialize_by(name: n)

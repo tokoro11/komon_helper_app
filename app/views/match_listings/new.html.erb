@@ -14,7 +14,7 @@
 <%= form_with model: @match_listing, local: true do |f| %>
   <div style="margin-bottom: 12px;">
     <%= f.label :gym_name, "体育館" %><br>
-    <%= f.text_field :gym_name, placeholder: "例：〇〇市総合体育館", style: "width: 300px;" %>
+    <%= f.text_field :gym_name, placeholder: "例：〇〇市総合体育館・東京都〇区〇高校 体育館」", style: "width: 300px;" %>
   </div>
 
   <!-- ★追加：地域（住所） -->

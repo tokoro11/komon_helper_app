@@ -1,14 +1,24 @@
 <h1>プロフィール編集</h1>
 
 <%= form_with model: @user, url: profile_path, method: :patch do |f| %>
+  <% if @user.errors.any? %>
+    <div style="border:1px solid #fca5a5; background:#fee2e2; padding:10px; border-radius:10px; margin-bottom:12px;">
+      <ul style="margin:0; padding-left:18px;">
+        <% @user.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
   <div>
     <%= f.label :name, "名前" %><br>
     <%= f.text_field :name %>
   </div>
 
   <div style="margin-top: 12px;">
-    <%= f.label :team_id, "所属チーム" %><br>
-    <%= f.collection_select :team_id, Team.order(:name), :id, :name, include_blank: "未設定" %>
+    <%= f.label :affiliation, "所属（例：〇〇高校バレー部）" %><br>
+    <%= f.text_field :affiliation, placeholder: "〇〇高校バレー部" %>
   </div>
 
   <div style="margin-top: 16px;">
