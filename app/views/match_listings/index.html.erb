@@ -1,0 +1,99 @@
+<%= search_form_for @q, url: match_listings_path, method: :get do |f| %>
+  <div style="border: 1px solid #ddd; padding: 12px; border-radius: 8px; margin-bottom: 16px;">
+    <h3>検索・絞り込み</h3>
+
+    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+      <div>
+        <label>日付（開始）</label><br>
+        <%= f.date_field :match_date_gteq %>
+      </div>
+
+      <div>
+        <label>日付（終了）</label><br>
+        <%= f.date_field :match_date_lteq %>
+      </div>
+
+      <div>
+        <label>種別</label><br>
+        <%= f.select :gender_category_eq,
+                     [["男子", "boys"], ["女子", "girls"]],
+                     include_blank: "指定なし" %>
+      </div>
+
+      <div>
+        <label>カテゴリ</label><br>
+        <%= f.select :school_category_eq,
+                     [["中学", "junior_high"], ["高校", "high_school"], ["大学", "university"]],
+                     include_blank: "指定なし" %>
+      </div>
+
+      <div>
+        <label>並び替え</label><br>
+        <%= f.select :s,
+                     [["近い順", "match_date asc"], ["新しい順", "created_at desc"]] %>
+      </div>
+    </div>
+
+    <div style="margin-top: 8px;">
+      <label>体育館名</label><br>
+      <%= f.search_field :gym_name_cont %>
+    </div>
+
+    <div style="margin-top: 8px;">
+      <label>地域（住所）</label><br>
+      <%= f.search_field :gym_address_cont %>
+    </div>
+
+    <div style="margin-top: 12px;">
+      <%= f.submit "検索" %>
+      <%= link_to "リセット", match_listings_path %>
+    </div>
+  </div>
+<% end %>
+
+<h1>練習試合 募集一覧</h1>
+
+<p>件数: <%= @match_listings.total_count %></p>
+
+<table style="width:100%; border-collapse: collapse;">
+  <thead>
+    <tr>
+      <th>日付</th>
+      <th>時間</th>
+      <th>種別</th>
+      <th>カテゴリ</th>
+      <th>募集者</th>
+      <th>体育館</th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @match_listings.each do |listing| %>
+      <tr>
+        <td><%= listing.match_date %></td>
+        <td><%= listing.start_time.strftime("%H:%M") %> - <%= listing.end_time.strftime("%H:%M") %></td>
+        <td><%= listing.gender_category == "boys" ? "男子" : "女子" %></td>
+        <td>
+          <%= { "junior_high"=>"中学", "high_school"=>"高校", "university"=>"大学" }[listing.school_category] %>
+        </td>
+
+        <td>
+          <%= listing.owner&.name || "User##{listing.owner_id}" %><br>
+          <small><%= listing.owner&.affiliation.presence || "所属未設定" %></small>
+        </td>
+
+        <td>
+          <%= listing.gym.name %><br>
+          <small><%= listing.gym.address %></small>
+        </td>
+
+        <td><%= link_to "詳細", match_listing_path(listing) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<div style="margin-top: 16px;">
+  <%= paginate @match_listings %>
+</div>

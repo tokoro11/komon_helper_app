@@ -1,0 +1,75 @@
+<div class="page">
+  <div class="card">
+    <% if @match_listing.match.present? %>
+      <p style="margin: 0 0 10px;">
+        <%= link_to "作成された試合を見る", match_path(@match_listing.match), class: "link" %>
+      </p>
+      <hr style="border:0;border-top:1px solid #eee;margin: 10px 0 0;">
+    <% end %>
+
+    <% gym = @match_listing.gym %>
+
+    <% if gym&.address.present? %>
+      <h2 class="h2">体育館の場所</h2>
+
+      <div class="map-wrap">
+        <iframe
+          src="<%= google_maps_embed_src(gym.address) %>"
+          width="100%"
+          height="100%"
+          style="border:0;"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          allowfullscreen>
+        </iframe>
+      </div>
+
+      <p class="muted" style="margin: 10px 0 12px;">
+        住所：<%= gym.address %>
+      </p>
+
+      <div class="actions-row">
+        <%= link_to "Googleマップで開く",
+          "https://www.google.com/maps/search/?api=1&query=#{ERB::Util.url_encode(gym.address)}",
+          target: "_blank",
+          rel: "noopener",
+          class: "btn btn-primary" %>
+      </div>
+    <% else %>
+      <p class="muted">体育館の住所が未設定です</p>
+    <% end %>
+  </div>
+
+  <div class="card">
+    <h2 class="h2">この募集に申請する</h2>
+
+    <% if @match_listing.open? %>
+      <%= form_with model: [@match_listing, MatchApplication.new], local: true do |f| %>
+        <div style="margin-bottom: 12px;">
+          <%= f.label :message, "メッセージ（任意）", class: "label" %><br>
+          <%= f.text_area :message, rows: 4, class: "textarea" %>
+        </div>
+
+        <div class="actions-row">
+          <%= f.submit "申請する", class: "btn btn-primary" %>
+          <%= link_to "申請一覧を見る", match_listing_match_applications_path(@match_listing), class: "btn" %>
+        </div>
+      <% end %>
+    <% else %>
+      <p class="muted">この募集は受付終了です</p>
+      <p style="margin-top: 10px;">
+        <%= link_to "申請一覧を見る", match_listing_match_applications_path(@match_listing), class: "btn" %>
+      </p>
+    <% end %>
+  </div>
+
+  <% if @match_listing.owner == current_user %>
+    <div class="card">
+      <h2 class="h2">募集の管理</h2>
+      <%= link_to "この募集を削除",
+            match_listing_path(@match_listing),
+            data: { turbo_method: :delete, turbo_confirm: "本当にこの募集を削除しますか？" },
+            class: "btn btn-danger" %>
+    </div>
+  <% end %>
+</div>

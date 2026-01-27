@@ -58,3 +58,9 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
+
+gem "rails-i18n"
+gem "devise-i18n"
+gem "devise", "~> 5.0"
+gem "ransack"
+gem "kaminari"
