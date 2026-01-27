@@ -28,13 +28,6 @@
       </div>
 
       <div>
-        <label>ステータス</label><br>
-        <%= f.select :status_eq,
-                     [["募集中", "open"], ["締切", "closed"], ["中止", "canceled"]],
-                     include_blank: "指定なし" %>
-      </div>
-
-      <div>
         <label>並び替え</label><br>
         <%= f.select :s,
                      [["近い順", "match_date asc"], ["新しい順", "created_at desc"]] %>
@@ -69,8 +62,8 @@
       <th>時間</th>
       <th>種別</th>
       <th>カテゴリ</th>
+      <th>募集者</th>
       <th>体育館</th>
-      <th>ステータス</th>
       <th></th>
     </tr>
   </thead>
@@ -84,13 +77,17 @@
         <td>
           <%= { "junior_high"=>"中学", "high_school"=>"高校", "university"=>"大学" }[listing.school_category] %>
         </td>
+
+        <td>
+          <%= listing.owner&.name || "User##{listing.owner_id}" %><br>
+          <small><%= listing.owner&.affiliation.presence || "所属未設定" %></small>
+        </td>
+
         <td>
           <%= listing.gym.name %><br>
           <small><%= listing.gym.address %></small>
         </td>
-        <td>
-          <%= { "open"=>"募集中", "closed"=>"締切", "canceled"=>"中止" }[listing.status] %>
-        </td>
+
         <td><%= link_to "詳細", match_listing_path(listing) %></td>
       </tr>
     <% end %>

@@ -6,9 +6,14 @@ class MatchApplicationsController < ApplicationController
   def create
     return redirect_to match_listing_path(@match_listing), alert: "この募集は受付終了です" unless @match_listing.open?
 
-    # ★追加：自分が作った募集には申請できない
+    # 自分が作った募集には申請できない
     if @match_listing.owner == current_user
       return redirect_to match_listing_path(@match_listing), alert: "自分が作った募集には申請できません"
+    end
+
+    # ✅ 申請者の所属が未設定なら申請させない
+    if current_user.affiliation.blank?
+      return redirect_to edit_profile_path, alert: "申請するにはプロフィールの所属（例：〇〇高校バレー部）を設定してください"
     end
 
     @application = @match_listing.match_applications.new(match_application_params)
@@ -31,8 +36,9 @@ class MatchApplicationsController < ApplicationController
     return redirect_to match_listing_match_applications_path(@match_listing), alert: "この申請は処理済みです" unless @match_application.pending?
     return redirect_to match_listing_match_applications_path(@match_listing), alert: "募集が受付中ではありません" unless @match_listing.open?
 
-    if @match_listing.owner.team_id.blank? || @match_application.applicant.team_id.blank?
-      return redirect_to match_listing_match_applications_path(@match_listing), alert: "チーム情報が未設定のため承認できません"
+    # ✅ 募集者/申請者どちらか所属未設定なら承認させない（安全）
+    if @match_listing.owner.affiliation.blank? || @match_application.applicant.affiliation.blank?
+      return redirect_to match_listing_match_applications_path(@match_listing), alert: "所属が未設定のため承認できません"
     end
 
     if @match_listing.match.present?
@@ -56,11 +62,11 @@ class MatchApplicationsController < ApplicationController
         match_listing: @match_listing,
         gym_id: @match_listing.gym_id,
         starts_at: starts_at,
-        team_a_id: @match_listing.owner.team_id,
-        team_b_id: @match_application.applicant.team_id,
         note: [
           @match_listing.notes.presence && "募集: #{@match_listing.notes}",
-          @match_application.message.presence && "申請: #{@match_application.message}"
+          @match_application.message.presence && "申請: #{@match_application.message}",
+          "募集者所属: #{@match_listing.owner.affiliation}",
+          "申請者所属: #{@match_application.applicant.affiliation}"
         ].compact.join("\n")
       )
     end

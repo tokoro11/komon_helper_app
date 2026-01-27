@@ -1,22 +1,22 @@
 <div id="<%= dom_id match %>">
   <p>
     <strong>日時：</strong>
-    <%= match.starts_at&.strftime("%Y-%m-%d %H:%M") %>
+    <%= match.starts_at&.strftime("%Y-%m-%d %H:%M") || "未設定" %>
   </p>
 
   <p>
-    <strong>自チーム：</strong>
-    <%= match.team_a&.name %>
+    <strong>自分（募集者）：</strong>
+    <%= match.team_a&.name || match.match_listing&.owner&.name || "未設定" %>
   </p>
 
   <p>
     <strong>対戦相手：</strong>
-    <%= match.team_b&.name %>
+    <%= match.team_b&.name || "未設定" %>
   </p>
 
   <p>
     <strong>会場：</strong>
-    <%= match.gym&.name %>
+    <%= match.gym&.name || "未設定" %>
   </p>
 
   <p>

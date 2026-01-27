@@ -1,6 +1,6 @@
 <h1>申請一覧</h1>
 
-<p>
+<p style="margin: 8px 0 16px;">
   募集日: <%= @match_listing.match_date %>
   <%= @match_listing.start_time.strftime("%H:%M") %> - <%= @match_listing.end_time.strftime("%H:%M") %>
   / 状態: <%= I18n.t("activerecord.attributes.match_listing.status.#{@match_listing.status}") %>
@@ -9,33 +9,50 @@
 <h2>未処理</h2>
 
 <% if @pending_apps.any? %>
-  <table>
+  <table style="width: 100%; border-collapse: collapse;">
     <thead>
       <tr>
-        <th>申請者</th>
-        <th>メッセージ</th>
-        <th>状態</th>
-        <th>申請日時</th>
-        <th>操作</th>
+        <th style="text-align:left; border-bottom: 1px solid #eee; padding: 8px;">申請者</th>
+        <th style="text-align:left; border-bottom: 1px solid #eee; padding: 8px;">メッセージ</th>
+        <th style="text-align:left; border-bottom: 1px solid #eee; padding: 8px;">状態</th>
+        <th style="text-align:left; border-bottom: 1px solid #eee; padding: 8px;">申請日時</th>
+        <th style="text-align:left; border-bottom: 1px solid #eee; padding: 8px;">操作</th>
       </tr>
     </thead>
     <tbody>
       <% @pending_apps.each do |app| %>
         <tr>
-          <td><%= app.applicant&.name || "User##{app.applicant_id}" %></td>
-          <td><%= app.message %></td>
-          <td><%= I18n.t("activerecord.attributes.match_application.status.#{app.status}") %></td>
-          <td><%= app.created_at.strftime("%Y/%m/%d %H:%M") %></td>
-          <td>
-            <%= button_to "承認",
-                  approve_match_listing_match_application_path(@match_listing, app),
-                  method: :patch,
-                  data: { turbo_confirm: "承認しますか？" } %>
+          <td style="border-bottom: 1px solid #f3f4f6; padding: 10px; vertical-align: top;">
+            <div><%= app.applicant&.name || "User##{app.applicant_id}" %></div>
+            <div style="color:#666; font-size: 12px; margin-top: 4px;">
+              所属：<%= app.applicant&.affiliation.presence || "未設定" %>
+            </div>
+          </td>
 
-            <%= button_to "却下",
-                  reject_match_listing_match_application_path(@match_listing, app),
-                  method: :patch,
-                  data: { turbo_confirm: "却下しますか？" } %>
+          <td style="border-bottom: 1px solid #f3f4f6; padding: 10px; vertical-align: top;">
+            <%= app.message.presence || "（なし）" %>
+          </td>
+
+          <td style="border-bottom: 1px solid #f3f4f6; padding: 10px; vertical-align: top;">
+            <%= I18n.t("activerecord.attributes.match_application.status.#{app.status}") %>
+          </td>
+
+          <td style="border-bottom: 1px solid #f3f4f6; padding: 10px; vertical-align: top;">
+            <%= app.created_at.strftime("%Y/%m/%d %H:%M") %>
+          </td>
+
+          <td style="border-bottom: 1px solid #f3f4f6; padding: 10px; vertical-align: top;">
+            <div style="display:flex; gap:8px; flex-wrap: wrap;">
+              <%= button_to "承認",
+                    approve_match_listing_match_application_path(@match_listing, app),
+                    method: :patch,
+                    data: { turbo_confirm: "承認しますか？" } %>
+
+              <%= button_to "却下",
+                    reject_match_listing_match_application_path(@match_listing, app),
+                    method: :patch,
+                    data: { turbo_confirm: "却下しますか？" } %>
+            </div>
           </td>
         </tr>
       <% end %>
@@ -45,42 +62,55 @@
   <p>未処理の申請はありません。</p>
 <% end %>
 
-<hr>
+<hr style="margin: 18px 0; border:0; border-top:1px solid #eee;">
 
 <h2>処理済み</h2>
 
 <% if @handled_apps.any? %>
-  <table>
+  <table style="width: 100%; border-collapse: collapse;">
     <thead>
       <tr>
-        <th>申請者</th>
-        <th>メッセージ</th>
-        <th>状態</th>
-        <th>申請日時</th>
+        <th style="text-align:left; border-bottom: 1px solid #eee; padding: 8px;">申請者</th>
+        <th style="text-align:left; border-bottom: 1px solid #eee; padding: 8px;">メッセージ</th>
+        <th style="text-align:left; border-bottom: 1px solid #eee; padding: 8px;">状態</th>
+        <th style="text-align:left; border-bottom: 1px solid #eee; padding: 8px;">申請日時</th>
       </tr>
     </thead>
     <tbody>
       <% @handled_apps.each do |app| %>
         <tr>
-          <td><%= app.applicant&.name || "User##{app.applicant_id}" %></td>
-          <td><%= app.message %></td>
-          <td>
+          <td style="border-bottom: 1px solid #f3f4f6; padding: 10px; vertical-align: top;">
+            <div><%= app.applicant&.name || "User##{app.applicant_id}" %></div>
+            <div style="color:#666; font-size: 12px; margin-top: 4px;">
+              所属：<%= app.applicant&.affiliation.presence || "未設定" %>
+            </div>
+          </td>
+
+          <td style="border-bottom: 1px solid #f3f4f6; padding: 10px; vertical-align: top;">
+            <%= app.message.presence || "（なし）" %>
+          </td>
+
+          <td style="border-bottom: 1px solid #f3f4f6; padding: 10px; vertical-align: top;">
             <% if app.approved? %>
-              <span style="display:inline-block; padding:2px 8px; border-radius:12px; background:#e6ffed; border:1px solid #b7f5c6;">
+              <span style="display:inline-block; padding:2px 8px; border-radius:12px; background:#e6ffed; border:1px solid #b7f5c6; margin-right: 6px;">
                 承認済み
               </span>
             <% elsif app.rejected? %>
-              <span style="display:inline-block; padding:2px 8px; border-radius:12px; background:#fee2e2; border:1px solid #fecaca;">
+              <span style="display:inline-block; padding:2px 8px; border-radius:12px; background:#fee2e2; border:1px solid #fecaca; margin-right: 6px;">
                 却下
               </span>
             <% elsif app.canceled? %>
-              <span style="display:inline-block; padding:2px 8px; border-radius:12px; background:#f3f4f6; border:1px solid #d1d5db;">
+              <span style="display:inline-block; padding:2px 8px; border-radius:12px; background:#f3f4f6; border:1px solid #d1d5db; margin-right: 6px;">
                 取消
               </span>
             <% end %>
+
             <%= I18n.t("activerecord.attributes.match_application.status.#{app.status}") %>
           </td>
-          <td><%= app.created_at.strftime("%Y/%m/%d %H:%M") %></td>
+
+          <td style="border-bottom: 1px solid #f3f4f6; padding: 10px; vertical-align: top;">
+            <%= app.created_at.strftime("%Y/%m/%d %H:%M") %>
+          </td>
         </tr>
       <% end %>
     </tbody>

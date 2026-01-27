@@ -7,4 +7,5 @@ class User < ApplicationRecord
   has_many :bookings, dependent: :destroy
 
   enum :role, { komon: 0, coach: 1, admin: 2 }
+  validates :affiliation, presence: true, length: { maximum: 50 }
 end

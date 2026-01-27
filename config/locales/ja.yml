@@ -3,6 +3,7 @@ ja:
     models:
       match_listing: "練習試合募集"
       gym: "体育館"
+      user: "ユーザー"
 
     attributes:
       gym:
@@ -33,9 +34,23 @@ ja:
           rejected: "却下"
           canceled: "キャンセル"
 
+      user:
+        name: "名前"
+        affiliation: "所属（例：〇〇高校バレー部）"
+
   enums:
     user:
       role:
         komon: "顧問"
         coach: "コーチ"
         admin: "管理者"
+
+  errors:
+    messages:
+      blank: "を入力してください"
+      too_long: "は%{count}文字以内で入力してください"
+
+  helpers:
+    submit:
+      update: "更新する"
+      create: "登録する"
