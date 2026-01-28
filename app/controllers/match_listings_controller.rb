@@ -3,6 +3,7 @@ class MatchListingsController < ApplicationController
   before_action :authorize_owner!, only: %i[edit update destroy]
 
   # ✅ 所属未設定ならプロフィールへ（募集の作成/編集だけ）
+  before_action :authenticate_user!, only: %i[new create edit update destroy]
   before_action :require_affiliation!, only: %i[new create edit update]
 
   def index
@@ -21,6 +22,8 @@ class MatchListingsController < ApplicationController
   end
 
   def show
+    @my_application =
+      current_user && @match_listing.match_applications.find_by(applicant_id: current_user.id)
   end
 
   def new
@@ -40,12 +43,8 @@ class MatchListingsController < ApplicationController
     if gym.present? && @match_listing.save
       redirect_to @match_listing, notice: "募集を作成しました"
     else
-      if gym.nil?
-        @match_listing.errors.add(:gym_name, "を入力してください") if match_listing_params[:gym_name].to_s.strip.blank?
-        @match_listing.errors.add(:gym_address, "を入力してください") if match_listing_params[:gym_address].to_s.strip.blank?
-      end
-      @match_listing.gym_name = match_listing_params[:gym_name]
-      @match_listing.gym_address = match_listing_params[:gym_address]
+      attach_gym_errors_if_needed(gym)
+      restore_gym_virtual_fields
       render :new, status: :unprocessable_entity
     end
   end
@@ -65,12 +64,8 @@ class MatchListingsController < ApplicationController
     if gym.present? && @match_listing.update(match_listing_params.except(:gym_name, :gym_address))
       redirect_to @match_listing, notice: "募集を更新しました"
     else
-      if gym.nil?
-        @match_listing.errors.add(:gym_name, "を入力してください") if match_listing_params[:gym_name].to_s.strip.blank?
-        @match_listing.errors.add(:gym_address, "を入力してください") if match_listing_params[:gym_address].to_s.strip.blank?
-      end
-      @match_listing.gym_name = match_listing_params[:gym_name]
-      @match_listing.gym_address = match_listing_params[:gym_address]
+      attach_gym_errors_if_needed(gym)
+      restore_gym_virtual_fields
       render :edit, status: :unprocessable_entity
     end
   end
@@ -109,16 +104,46 @@ class MatchListingsController < ApplicationController
     )
   end
 
+  # ✅ Gym を作る/再利用する（失敗したら nil を返す）
   def find_or_create_gym_from_name_and_address(name, address)
     n = name.to_s.strip
     a = address.to_s.strip
-
-    # 体育館名も住所も必須
     return nil if n.blank? || a.blank?
 
     gym = Gym.find_or_initialize_by(name: n)
     gym.address = a
-    gym.save!
-    gym
+
+    return gym if gym.save
+    nil
+  end
+
+  # ✅ gym が nil のとき、入力不足や保存失敗のエラーを付与
+  def attach_gym_errors_if_needed(gym)
+    return if gym.present?
+
+    if match_listing_params[:gym_name].to_s.strip.blank?
+      @match_listing.errors.add(:gym_name, "を入力してください")
+    end
+
+    if match_listing_params[:gym_address].to_s.strip.blank?
+      @match_listing.errors.add(:gym_address, "を入力してください")
+    end
+
+    # name/address は入ってるのに gym が作れなかった（validation等）
+    if match_listing_params[:gym_name].to_s.strip.present? && match_listing_params[:gym_address].to_s.strip.present?
+      @match_listing.errors.add(:base, "体育館の保存に失敗しました。入力内容を確認してください")
+    end
+  end
+
+  # ✅ フォーム再表示時に仮想属性を戻す
+  def restore_gym_virtual_fields
+    @match_listing.gym_name = match_listing_params[:gym_name]
+    @match_listing.gym_address = match_listing_params[:gym_address]
+  end
+
+  # ✅ affiliation 未設定ユーザーは募集作成/編集に進めない
+  def require_affiliation!
+    return if current_user&.affiliation.to_s.strip.present?
+    redirect_to edit_user_registration_path, alert: "所属を設定してください"
   end
 end

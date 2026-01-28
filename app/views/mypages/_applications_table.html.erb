@@ -1,0 +1,41 @@
+<% if apps.any? %>
+  <table style="width: 100%; border-collapse: collapse; border:1px solid #e5e7eb; border-radius: 12px; overflow:hidden;">
+    <thead style="background:#f9fafb;">
+      <tr>
+        <th style="text-align:left; border-bottom: 1px solid #eee; padding: 10px;">募集</th>
+        <th style="text-align:left; border-bottom: 1px solid #eee; padding: 10px;">募集者</th>
+        <th style="text-align:left; border-bottom: 1px solid #eee; padding: 10px;">状態</th>
+        <th style="text-align:left; border-bottom: 1px solid #eee; padding: 10px;">申請日時</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% apps.each do |app| %>
+        <% listing = app.match_listing %>
+        <tr>
+          <td style="border-bottom: 1px solid #f3f4f6; padding: 10px;">
+            <%= link_to "募集詳細", match_listing_path(listing), style: "color:#2563eb;" %>
+            <div style="color:#6b7280; font-size:12px; margin-top:4px;">
+              <%= listing.match_date %> <%= listing.start_time.strftime("%H:%M") %>〜
+              / 会場：<%= listing.gym&.name || "未設定" %>
+            </div>
+          </td>
+
+          <td style="border-bottom: 1px solid #f3f4f6; padding: 10px;">
+            <%= listing.owner&.affiliation.presence || listing.owner&.name || "募集者" %>
+          </td>
+
+          <td style="border-bottom: 1px solid #f3f4f6; padding: 10px;">
+            <%= I18n.t("enums.match_application.status.#{app.status}", default: app.status) %>
+          </td>
+
+          <td style="border-bottom: 1px solid #f3f4f6; padding: 10px;">
+            <%= app.created_at.in_time_zone("Tokyo").strftime("%Y/%m/%d %H:%M") %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p>該当する申請はありません。</p>
+<% end %>
