@@ -1,0 +1,61 @@
+<h1>練習試合 募集を作成</h1>
+
+<% if @match_listing.errors.any? %>
+  <div style="margin-bottom: 16px; padding: 12px; border: 1px solid #f5c2c7; background: #f8d7da;">
+    <p style="margin: 0 0 8px 0;"><strong>入力に誤りがあります</strong></p>
+    <ul style="margin: 0; padding-left: 20px;">
+      <% @match_listing.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<%= form_with model: @match_listing, local: true do |f| %>
+  <div style="margin-bottom: 12px;">
+    <%= f.label :gym_name, "体育館" %><br>
+    <%= f.text_field :gym_name, placeholder: "例：〇〇市総合体育館・東京都〇区〇高校 体育館」", style: "width: 300px;" %>
+  </div>
+
+  <!-- ★追加：地域（住所） -->
+  <div style="margin-bottom: 12px;">
+    <%= f.label :gym_address, "地域（住所）" %><br>
+    <%= f.text_field :gym_address, placeholder: "例：東京都渋谷区 / 横浜市 など", style: "width: 300px;" %>
+  </div>
+
+  <div style="margin-bottom: 12px;">
+    <%= f.label :match_date, "日付" %><br>
+    <%= f.date_field :match_date, min: Date.current %>
+  </div>
+
+  <div style="margin-bottom: 12px;">
+    <%= f.label :start_time, "開始時間" %><br>
+    <%= f.time_field :start_time %>
+  </div>
+
+  <div style="margin-bottom: 12px;">
+    <%= f.label :end_time, "終了時間" %><br>
+    <%= f.time_field :end_time %>
+  </div>
+
+  <div style="margin-bottom: 12px;">
+    <%= f.label :gender_category, "種別" %><br>
+    <%= f.select :gender_category, [["男子", "boys"], ["女子", "girls"]], prompt: "選択してください" %>
+  </div>
+
+  <div style="margin-bottom: 12px;">
+    <%= f.label :school_category, "カテゴリ" %><br>
+    <%= f.select :school_category, [["中学", "junior_high"], ["高校", "high_school"], ["大学", "university"]], prompt: "選択してください" %>
+  </div>
+
+  <div style="margin-bottom: 12px;">
+    <%= f.label :notes, "備考（求めるレベルなど）" %><br>
+    <%= f.text_area :notes, rows: 6, style: "width: 100%; max-width: 600px;" %>
+  </div>
+
+  <%= f.submit "募集を作成" %>
+<% end %>
+
+<p style="margin-top: 16px;">
+  <%= link_to "一覧に戻る", match_listings_path %>
+</p>

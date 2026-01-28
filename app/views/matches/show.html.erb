@@ -1,9 +1,61 @@
-<%= render @match %>
+<h1>試合詳細</h1>
 
-<div>
-  <%= link_to "編集", edit_match_path(@match) %> |
-  <%= link_to "一覧へ戻る", matches_path %>
+<div style="border:1px solid #ddd; border-radius:12px; padding:16px; margin-bottom:14px;">
+  <p style="margin:0 0 10px;">
+    <strong><%= @match.display_title %></strong>
+  </p>
 
-  <%= button_to "削除", @match, method: :delete, data: { turbo_confirm: "削除してよいですか？" } %>
+  <table style="width:100%; border-collapse: collapse;">
+    <tr>
+      <th style="text-align:left; padding:8px; border-bottom:1px solid #eee; width:140px;">日時</th>
+      <td style="padding:8px; border-bottom:1px solid #eee;">
+        <%= @match.starts_at&.in_time_zone("Tokyo")&.strftime("%Y/%m/%d %H:%M") || "未設定" %>
+      </td>
+    </tr>
+
+    <tr>
+      <th style="text-align:left; padding:8px; border-bottom:1px solid #eee;">自チーム</th>
+      <td style="padding:8px; border-bottom:1px solid #eee;">
+        <%= @match.team_a_display_name %>
+      </td>
+    </tr>
+
+    <tr>
+      <th style="text-align:left; padding:8px; border-bottom:1px solid #eee;">対戦相手</th>
+      <td style="padding:8px; border-bottom:1px solid #eee;">
+        <%= @match.team_b_display_name %>
+      </td>
+    </tr>
+
+    <tr>
+      <th style="text-align:left; padding:8px; border-bottom:1px solid #eee;">会場</th>
+      <td style="padding:8px; border-bottom:1px solid #eee;">
+        <%= @match.gym&.name.presence || "未設定" %>
+      </td>
+    </tr>
+  </table>
+
+  <% if @match.note.present? %>
+    <div style="margin-top:12px;">
+      <h3 style="margin:0 0 6px;">メモ</h3>
+      <pre style="margin:0; padding:10px; background:#fafafa; border:1px solid #eee; border-radius:10px; white-space:pre-wrap;"><%= @match.note %></pre>
+    </div>
+  <% end %>
+
+  <% if @match.match_listing.present? %>
+    <p style="margin-top:12px;">
+      <%= link_to "元の募集を見る", match_listing_path(@match.match_listing), style: "color:#2563eb;" %>
+    </p>
+  <% end %>
 </div>
 
+<div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+  <%= link_to "編集", edit_match_path(@match), style: "color:#2563eb;" %>
+  <span>|</span>
+  <%= link_to "一覧へ戻る", matches_path, style: "color:#2563eb;" %>
+
+  <%= button_to "削除", @match,
+        method: :delete,
+        data: { turbo_confirm: "削除してよいですか？" },
+        style: "margin-left:10px;" %>
+</div>

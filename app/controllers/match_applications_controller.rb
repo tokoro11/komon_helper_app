@@ -1,7 +1,6 @@
 class MatchApplicationsController < ApplicationController
   before_action :authenticate_user!
 
-  # ネスト時だけセット
   before_action :set_match_listing, if: -> { params[:match_listing_id].present? }
   before_action :set_match_application, only: [:show, :approve, :reject], if: -> { params[:match_listing_id].present? }
   before_action :authorize_owner!, only: [:index, :approve, :reject], if: -> { params[:match_listing_id].present? }
@@ -23,7 +22,6 @@ class MatchApplicationsController < ApplicationController
     @application.status = :pending
 
     if @application.save
-      # ✅ 申請受信通知（募集者へ）
       begin
         Notification.create!(
           user: @match_listing.owner,
@@ -44,11 +42,9 @@ class MatchApplicationsController < ApplicationController
 
   def index
     if @match_listing.present?
-      # ✅ 募集ごとの申請一覧（今まで通り）
       @pending_apps = @match_listing.match_applications.pending.includes(:applicant).order(created_at: :desc)
       @handled_apps = @match_listing.match_applications.where.not(status: :pending).includes(:applicant).order(created_at: :desc)
     else
-      # ✅ 受信箱（自分の募集に届いた申請をまとめて）
       @pending_apps = MatchApplication
         .joins(:match_listing)
         .includes(:applicant, match_listing: [:gym, :owner])
@@ -73,7 +69,17 @@ class MatchApplicationsController < ApplicationController
     return redirect_to match_listing_match_applications_path(@match_listing), alert: "この申請は処理済みです" unless @match_application.pending?
     return redirect_to match_listing_match_applications_path(@match_listing), alert: "募集が受付中ではありません" unless @match_listing.open?
 
-    if @match_listing.owner.affiliation.blank? || @match_application.applicant.affiliation.blank?
+    owner = @match_listing.owner
+    applicant = @match_application.applicant
+
+    # ✅ team単位運用：両者が team に所属してないと成立させない
+    if owner.team_id.blank? || applicant.team_id.blank?
+      return redirect_to match_listing_match_applications_path(@match_listing),
+                         alert: "チーム未所属のため承認できません（募集者・申請者ともにチーム所属が必要です）"
+    end
+
+    # 所属（表示用）が空ならメッセージは作れるが、あなたの運用ならここも必須のままでOK
+    if owner.affiliation.blank? || applicant.affiliation.blank?
       return redirect_to match_listing_match_applications_path(@match_listing), alert: "所属が未設定のため承認できません"
     end
 
@@ -103,22 +109,28 @@ class MatchApplicationsController < ApplicationController
         match_listing: @match_listing,
         gym_id: @match_listing.gym_id,
         starts_at: starts_at,
-        team_a_name: @match_listing.owner.affiliation,
-        team_b_name: @match_application.applicant.affiliation,
+
+        # ✅ ここが本丸：IDを入れる
+        team_a_id: owner.team_id,
+        team_b_id: applicant.team_id,
+
+        # ✅ 表示用の保険（既存データ互換・一覧/詳細で困らない）
+        team_a_name: owner.team&.name.presence || owner.affiliation,
+        team_b_name: applicant.team&.name.presence || applicant.affiliation,
+
         note: [
           @match_listing.notes.presence && "募集: #{@match_listing.notes}",
           @match_application.message.presence && "申請: #{@match_application.message}",
-          "募集者所属: #{@match_listing.owner.affiliation}",
-          "申請者所属: #{@match_application.applicant.affiliation}"
+          "募集者所属: #{owner.affiliation}",
+          "申請者所属: #{applicant.affiliation}"
         ].compact.join("\n")
       )
 
-      # ✅ 承認通知（申請者へ）
       Notification.create!(
-        user: @match_application.applicant,
+        user: applicant,
         kind: :match_request_approved,
         title: "試合申請が承認されました",
-        body: "#{@match_listing.owner.affiliation} が申請を承認しました。",
+        body: "#{owner.affiliation} が申請を承認しました。",
         notifiable: @match_application
       )
     end
@@ -135,7 +147,6 @@ class MatchApplicationsController < ApplicationController
 
     @match_application.rejected!
 
-    # ✅ 却下通知（申請者へ）
     Notification.create!(
       user: @match_application.applicant,
       kind: :match_request_rejected,
