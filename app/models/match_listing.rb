@@ -3,7 +3,7 @@ class MatchListing < ApplicationRecord
   belongs_to :gym
 
   has_many :match_applications, dependent: :destroy
-  has_one :match, dependent: :destroy
+  has_one :match, dependent: :nullify
 
   # フォーム入力用（Gym保存用の仮想属性）
   attr_accessor :gym_name, :gym_address
@@ -17,20 +17,20 @@ class MatchListing < ApplicationRecord
             presence: true
 
   validate :end_time_after_start_time
-  validate :gym_address_required   # ← ここがマッチング専用の必須チェック
+  validate :gym_address_required
 
   # ===== Ransack allowlist（検索・絞り込み用）=====
-  def self.ransackable_attributes(auth_object = nil)
+  def self.ransackable_attributes(_auth_object = nil)
     %w[
       match_date start_time end_time
       gender_category school_category status
-      gym_id
+      gym_id owner_id
       created_at updated_at
     ]
   end
 
-  def self.ransackable_associations(auth_object = nil)
-    %w[gym]
+  def self.ransackable_associations(_auth_object = nil)
+    %w[gym owner]
   end
   # ===============================================
 

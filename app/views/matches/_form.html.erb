@@ -1,48 +1,73 @@
 <%= form_with(model: match) do |form| %>
   <% if match.errors.any? %>
-    <div style="color: red">
-      <h2><%= pluralize(match.errors.count, "error") %> prohibited this match from being saved:</h2>
-      <ul>
-        <% match.errors.each do |error| %>
-          <li><%= error.full_message %></li>
+    <div style="padding:12px; border:1px solid #fca5a5; background:#fef2f2; border-radius:8px; margin-bottom:12px;">
+      <strong><%= pluralize(match.errors.count, "error") %> prohibited this match from being saved:</strong>
+      <ul style="margin:8px 0 0; padding-left:18px;">
+        <% match.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
         <% end %>
       </ul>
     </div>
   <% end %>
 
-  <!-- 候補一覧（入力は自由） -->
+  <!-- 候補一覧（自由入力の補助） -->
   <datalist id="team_names">
     <% @teams.each do |t| %>
       <option value="<%= t.name %>"></option>
     <% end %>
   </datalist>
 
-  <div>
-    <%= form.label :team_a_name, "自チーム" %><br>
-    <%= form.text_field :team_a_name, list: "team_names", placeholder: "例：〇〇高校" %>
+  <!-- 自チーム（固定表示） -->
+  <div style="margin-bottom: 12px;">
+    <label>自チーム</label><br>
+    <div style="padding:8px 10px; border:1px solid #ddd; border-radius:8px; background:#fafafa;">
+      <%= current_user&.team&.name.presence || "（チーム未所属）" %>
+    </div>
+    <small style="color:#666;">※自チームはログイン中ユーザーのチームで固定されます</small>
   </div>
 
-  <div>
-    <%= form.label :team_b_name, "対戦相手" %><br>
-    <%= form.text_field :team_b_name, list: "team_names", placeholder: "例：△△高校" %>
+  <!-- 対戦相手（チーム選択） -->
+  <div style="margin-bottom: 12px;">
+    <%= form.label :team_b_id, "対戦相手（チーム選択）" %><br>
+    <% opponent_teams = @teams.reject { |t| t.id == current_user&.team_id } %>
+    <%= form.collection_select :team_b_id, opponent_teams, :id, :name,
+          { include_blank: "選択してください" },
+          { style: "width:100%; padding:8px; border:1px solid #ddd; border-radius:8px;" } %>
+    <small style="color:#666;">※相手チームが未登録なら下の「自由入力」を使ってOK</small>
   </div>
 
-  <div>
+  <!-- 対戦相手（自由入力：任意） -->
+  <div style="margin-bottom: 12px;">
+    <%= form.label :team_b_name, "対戦相手（自由入力）" %><br>
+    <%= form.text_field :team_b_name, list: "team_names", placeholder: "例：△△高校",
+          style: "width:100%; padding:8px; border:1px solid #ddd; border-radius:8px;" %>
+  </div>
+
+  <div style="margin-bottom: 12px;">
     <%= form.label :gym_name, "会場" %><br>
-    <%= form.text_field :gym_name, placeholder: "例：第一体育館" %>
+    <%= form.text_field :gym_name, placeholder: "例：第一体育館",
+          style: "width:100%; padding:8px; border:1px solid #ddd; border-radius:8px;" %>
   </div>
 
-  <div>
+  <div style="margin-bottom: 12px;">
     <%= form.label :starts_at, "開始日時" %><br>
-    <%= form.datetime_local_field :starts_at %>
+    <%= form.datetime_local_field :starts_at,
+          style: "padding:8px; border:1px solid #ddd; border-radius:8px;" %>
   </div>
 
-  <div>
+  <div style="margin-bottom: 12px;">
     <%= form.label :note, "メモ" %><br>
-    <%= form.text_area :note %>
+    <%= form.text_area :note, rows: 4,
+          style: "width:100%; padding:8px; border:1px solid #ddd; border-radius:8px;" %>
   </div>
 
+  <%# match_listing_id を使うなら hidden で維持（フォームに出さない） %>
+  <% if match.match_listing_id.present? %>
+    <%= form.hidden_field :match_listing_id %>
+  <% end %>
+
   <div>
-    <%= form.submit(match.persisted? ? "更新する" : "作成する") %>
+    <%= form.submit(match.persisted? ? "更新する" : "作成する",
+          style: "background:#2563eb; color:#fff; padding:10px 14px; border:none; border-radius:10px; cursor:pointer;" ) %>
   </div>
 <% end %>

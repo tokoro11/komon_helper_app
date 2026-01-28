@@ -1,0 +1,66 @@
+<h1 style="margin-bottom: 8px;">申請詳細</h1>
+
+<div style="border:1px solid #e5e7eb; border-radius:12px; padding:12px 14px; background:#fafafa; margin-bottom:16px;">
+  <div style="font-weight:600; margin-bottom:6px;">募集</div>
+  <div style="color:#374151;">
+    <div><span style="color:#6b7280;">日付：</span><%= @match_listing.match_date %></div>
+    <div><span style="color:#6b7280;">時間：</span><%= @match_listing.start_time.strftime("%H:%M") %> - <%= @match_listing.end_time.strftime("%H:%M") %></div>
+    <div>
+      <span style="color:#6b7280;">会場：</span>
+      <%= @match_listing.gym&.name || "未設定" %>
+      <% if @match_listing.gym&.address.present? %>
+        <span style="color:#6b7280;">（<%= @match_listing.gym.address %>）</span>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<div style="border:1px solid #e5e7eb; border-radius:12px; padding:12px 14px;">
+  <div style="font-weight:600; margin-bottom:6px;">申請内容</div>
+
+  <div style="display:flex; gap:12px; flex-wrap:wrap; color:#374151;">
+    <div>
+      <span style="color:#6b7280;">申請者：</span>
+      <%= @match_application.applicant&.name || "User##{@match_application.applicant_id}" %>
+    </div>
+    <div>
+      <span style="color:#6b7280;">所属：</span>
+      <%= @match_application.applicant&.affiliation.presence || "未設定" %>
+    </div>
+    <div>
+      <span style="color:#6b7280;">状態：</span>
+      <%= I18n.t("enums.match_application.status.#{@match_application.status}", default: @match_application.status) %>
+    </div>
+    <div>
+      <span style="color:#6b7280;">申請日時：</span>
+      <%= @match_application.created_at.in_time_zone("Tokyo").strftime("%Y/%m/%d %H:%M") %>
+    </div>
+  </div>
+
+  <div style="margin-top:12px;">
+    <div style="color:#6b7280; margin-bottom:6px;">メッセージ</div>
+    <div style="white-space:pre-wrap; background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:10px;">
+      <%= @match_application.message.presence || "（なし）" %>
+    </div>
+  </div>
+
+  <% if @match_application.pending? && @match_listing.open? %>
+    <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
+      <%= button_to "承認",
+            approve_match_listing_match_application_path(@match_listing, @match_application),
+            method: :patch,
+            data: { turbo_confirm: "承認しますか？" },
+            style: "padding:8px 12px; border-radius:10px; border:1px solid #86efac; background:#ecfdf5; cursor:pointer;" %>
+
+      <%= button_to "却下",
+            reject_match_listing_match_application_path(@match_listing, @match_application),
+            method: :patch,
+            data: { turbo_confirm: "却下しますか？" },
+            style: "padding:8px 12px; border-radius:10px; border:1px solid #fecaca; background:#fef2f2; cursor:pointer;" %>
+    </div>
+  <% end %>
+
+  <div style="margin-top:12px;">
+    <%= link_to "申請一覧に戻る", match_listing_match_applications_path(@match_listing), style: "color:#2563eb;" %>
+  </div>
+</div>
