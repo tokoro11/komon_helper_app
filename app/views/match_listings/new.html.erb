@@ -25,7 +25,7 @@
 
   <div style="margin-bottom: 12px;">
     <%= f.label :match_date, "日付" %><br>
-    <%= f.date_field :match_date %>
+    <%= f.date_field :match_date, min: Date.current %>
   </div>
 
   <div style="margin-bottom: 12px;">

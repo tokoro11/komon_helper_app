@@ -1,17 +1,19 @@
 class MatchApplicationsController < ApplicationController
-  before_action :set_match_listing
-  before_action :set_match_application, only: [:approve, :reject]
-  before_action :authorize_owner!, only: [:index, :approve, :reject]
+  before_action :authenticate_user!
+
+  # ネスト時だけセット
+  before_action :set_match_listing, if: -> { params[:match_listing_id].present? }
+  before_action :set_match_application, only: [:show, :approve, :reject], if: -> { params[:match_listing_id].present? }
+  before_action :authorize_owner!, only: [:index, :approve, :reject], if: -> { params[:match_listing_id].present? }
 
   def create
+    return redirect_to match_listings_path, alert: "募集を選んでから申請してください" unless @match_listing.present?
     return redirect_to match_listing_path(@match_listing), alert: "この募集は受付終了です" unless @match_listing.open?
 
-    # 自分が作った募集には申請できない
     if @match_listing.owner == current_user
       return redirect_to match_listing_path(@match_listing), alert: "自分が作った募集には申請できません"
     end
 
-    # ✅ 申請者の所属が未設定なら申請させない
     if current_user.affiliation.blank?
       return redirect_to edit_profile_path, alert: "申請するにはプロフィールの所属（例：〇〇高校バレー部）を設定してください"
     end
@@ -21,6 +23,19 @@ class MatchApplicationsController < ApplicationController
     @application.status = :pending
 
     if @application.save
+      # ✅ 申請受信通知（募集者へ）
+      begin
+        Notification.create!(
+          user: @match_listing.owner,
+          kind: :match_application_received,
+          title: "試合申請が届きました",
+          body: "#{current_user.affiliation} から申請が届きました。",
+          notifiable: @application
+        )
+      rescue => e
+        Rails.logger.warn("[Notification] failed to create match_application_received: #{e.class} #{e.message}")
+      end
+
       redirect_to match_listing_path(@match_listing), notice: "申請しました"
     else
       redirect_to match_listing_path(@match_listing), alert: @application.errors.full_messages.join(", ")
@@ -28,15 +43,36 @@ class MatchApplicationsController < ApplicationController
   end
 
   def index
-    @pending_apps = @match_listing.match_applications.pending.includes(:applicant).order(created_at: :desc)
-    @handled_apps = @match_listing.match_applications.where.not(status: :pending).includes(:applicant).order(created_at: :desc)
+    if @match_listing.present?
+      # ✅ 募集ごとの申請一覧（今まで通り）
+      @pending_apps = @match_listing.match_applications.pending.includes(:applicant).order(created_at: :desc)
+      @handled_apps = @match_listing.match_applications.where.not(status: :pending).includes(:applicant).order(created_at: :desc)
+    else
+      # ✅ 受信箱（自分の募集に届いた申請をまとめて）
+      @pending_apps = MatchApplication
+        .joins(:match_listing)
+        .includes(:applicant, match_listing: [:gym, :owner])
+        .where(match_listings: { owner_id: current_user.id })
+        .where(status: :pending)
+        .order(created_at: :desc)
+
+      @handled_apps = MatchApplication
+        .joins(:match_listing)
+        .includes(:applicant, match_listing: [:gym, :owner])
+        .where(match_listings: { owner_id: current_user.id })
+        .where.not(status: :pending)
+        .order(created_at: :desc)
+    end
+  end
+
+  def show
+    @match_application = @match_listing.match_applications.find(params[:id])
   end
 
   def approve
     return redirect_to match_listing_match_applications_path(@match_listing), alert: "この申請は処理済みです" unless @match_application.pending?
     return redirect_to match_listing_match_applications_path(@match_listing), alert: "募集が受付中ではありません" unless @match_listing.open?
 
-    # ✅ 募集者/申請者どちらか所属未設定なら承認させない（安全）
     if @match_listing.owner.affiliation.blank? || @match_application.applicant.affiliation.blank?
       return redirect_to match_listing_match_applications_path(@match_listing), alert: "所属が未設定のため承認できません"
     end
@@ -54,20 +90,36 @@ class MatchApplicationsController < ApplicationController
       @match_listing.match_applications.pending.where.not(id: @match_application.id)
                     .update_all(status: MatchApplication.statuses[:rejected], updated_at: Time.current)
 
-      starts_at = Time.zone.parse(
-        "#{@match_listing.match_date} #{@match_listing.start_time.strftime('%H:%M:%S')}"
+      starts_at = Time.zone.local(
+        @match_listing.match_date.year,
+        @match_listing.match_date.month,
+        @match_listing.match_date.day,
+        @match_listing.start_time.hour,
+        @match_listing.start_time.min,
+        @match_listing.start_time.sec
       )
 
       match = Match.create!(
         match_listing: @match_listing,
         gym_id: @match_listing.gym_id,
         starts_at: starts_at,
+        team_a_name: @match_listing.owner.affiliation,
+        team_b_name: @match_application.applicant.affiliation,
         note: [
           @match_listing.notes.presence && "募集: #{@match_listing.notes}",
           @match_application.message.presence && "申請: #{@match_application.message}",
           "募集者所属: #{@match_listing.owner.affiliation}",
           "申請者所属: #{@match_application.applicant.affiliation}"
         ].compact.join("\n")
+      )
+
+      # ✅ 承認通知（申請者へ）
+      Notification.create!(
+        user: @match_application.applicant,
+        kind: :match_request_approved,
+        title: "試合申請が承認されました",
+        body: "#{@match_listing.owner.affiliation} が申請を承認しました。",
+        notifiable: @match_application
       )
     end
 
@@ -82,6 +134,16 @@ class MatchApplicationsController < ApplicationController
     return redirect_to match_listing_match_applications_path(@match_listing), alert: "この申請は処理済みです" unless @match_application.pending?
 
     @match_application.rejected!
+
+    # ✅ 却下通知（申請者へ）
+    Notification.create!(
+      user: @match_application.applicant,
+      kind: :match_request_rejected,
+      title: "試合申請が却下されました",
+      body: "#{@match_listing.owner.affiliation} が申請を却下しました。",
+      notifiable: @match_application
+    )
+
     redirect_to match_listing_match_applications_path(@match_listing), notice: "却下しました"
   end
 

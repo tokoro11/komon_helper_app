@@ -5,13 +5,13 @@
   </p>
 
   <p>
-    <strong>自分（募集者）：</strong>
-    <%= match.team_a&.name || match.match_listing&.owner&.name || "未設定" %>
+    <strong>自チーム：</strong>
+    <%= match.team_a_name.presence || "未設定" %>
   </p>
 
   <p>
     <strong>対戦相手：</strong>
-    <%= match.team_b&.name || "未設定" %>
+    <%= match.team_b_name.presence || "未設定" %>
   </p>
 
   <p>

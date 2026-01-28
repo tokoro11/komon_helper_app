@@ -23,22 +23,37 @@
       <div style="display: flex; gap: 16px; align-items: center;">
         <strong style="font-size: 18px;">顧問ヘルパー</strong>
 
-        <nav style="display: flex; gap: 12px;">
+        <nav style="display: flex; gap: 12px; align-items: center;">
           <%= link_to "ホーム", root_path %>
-          <%= link_to "予約", bookings_path %>
-          <%= link_to "試合", matches_path %>
+          <%= link_to "体育館予約", bookings_path %>
+          <%= link_to "試合予定", matches_path %>
+          <%= link_to "試合マッチング", match_listings_path %>
+
+          <% if user_signed_in? %>
+            <%= link_to "試合申請", match_applications_path %>
+
+            <% unread_count = current_user.notifications.unread.count %>
+            <%= link_to notifications_path, style: "display:inline-flex; gap:6px; align-items:center;" do %>
+              <span>通知</span>
+              <% if unread_count.positive? %>
+                <span style="display:inline-block; min-width:18px; padding:0 6px; border-radius:999px; background:#e11d48; color:#fff; font-size:12px; line-height:18px; text-align:center;">
+                  <%= unread_count %>
+                </span>
+              <% end %>
+            <% end %>
+
+            <%= link_to "マイページ", mypage_path %>
+          <% end %>
         </nav>
       </div>
 
-      <div>
+      <div style="display:flex; gap:12px; align-items:center;">
         <% if user_signed_in? %>
-          <span style="margin-right: 12px;"><%= current_user.name.presence || current_user.email %></span>
-
-          <%= link_to "プロフィール", edit_profile_path, style: "margin-right: 12px;" %>
-
+          <span><%= current_user.name.presence || current_user.email %></span>
+          <%= link_to "プロフィール", edit_profile_path %>
           <%= button_to "ログアウト", destroy_user_session_path, method: :delete, form: { style: "display:inline;" } %>
         <% else %>
-          <%= link_to "ログイン", new_user_session_path, style: "margin-right: 12px;" %>
+          <%= link_to "ログイン", new_user_session_path %>
           <%= link_to "新規登録", new_user_registration_path %>
         <% end %>
       </div>

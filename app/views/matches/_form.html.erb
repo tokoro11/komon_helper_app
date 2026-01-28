@@ -10,17 +10,23 @@
     </div>
   <% end %>
 
+  <!-- 候補一覧（入力は自由） -->
+  <datalist id="team_names">
+    <% @teams.each do |t| %>
+      <option value="<%= t.name %>"></option>
+    <% end %>
+  </datalist>
+
   <div>
-    <%= form.label :team_a_id, "自チーム" %><br>
-    <%= form.collection_select :team_a_id, Team.order(:id), :id, :name, prompt: "選択してください" %>
+    <%= form.label :team_a_name, "自チーム" %><br>
+    <%= form.text_field :team_a_name, list: "team_names", placeholder: "例：〇〇高校" %>
   </div>
 
   <div>
-    <%= form.label :team_b_id, "対戦相手" %><br>
-    <%= form.collection_select :team_b_id, Team.order(:id), :id, :name, prompt: "選択してください" %>
+    <%= form.label :team_b_name, "対戦相手" %><br>
+    <%= form.text_field :team_b_name, list: "team_names", placeholder: "例：△△高校" %>
   </div>
 
-  <!-- ★ここだけ変更：会場を自由入力 -->
   <div>
     <%= form.label :gym_name, "会場" %><br>
     <%= form.text_field :gym_name, placeholder: "例：第一体育館" %>
@@ -37,6 +43,6 @@
   </div>
 
   <div>
-    <%= form.submit %>
+    <%= form.submit(match.persisted? ? "更新する" : "作成する") %>
   </div>
 <% end %>

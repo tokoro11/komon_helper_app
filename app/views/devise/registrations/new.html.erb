@@ -16,6 +16,11 @@
   </div>
 
   <div class="field">
+    <%= f.label :affiliation, "所属（例：〇〇高校バレー部）" %><br />
+    <%= f.text_field :affiliation, autofocus: true, autocomplete: "organization" %>
+  </div>
+
+  <div class="field">
     <p><%= f.label :password %></p>
     <% if @minimum_password_length %>
       <p><em>(<%= @minimum_password_length %> characters minimum)</em></p>

@@ -1,10 +1,12 @@
 <div class="page">
+  <!-- ✅ 成立導線（上に目立つ形で） -->
   <div class="card">
     <% if @match_listing.match.present? %>
-      <p style="margin: 0 0 10px;">
+      <div style="border:1px solid #b7f5c6; background:#e6ffed; padding:12px; border-radius:12px;">
+        <div style="font-weight: 700; margin-bottom: 6px;">この募集は成立しました</div>
         <%= link_to "作成された試合を見る", match_path(@match_listing.match), class: "link" %>
-      </p>
-      <hr style="border:0;border-top:1px solid #eee;margin: 10px 0 0;">
+      </div>
+      <hr style="border:0;border-top:1px solid #eee;margin: 12px 0 0;">
     <% end %>
 
     <% gym = @match_listing.gym %>
@@ -40,10 +42,59 @@
     <% end %>
   </div>
 
+  <!-- ✅ 申請者向け：自分の申請状況（＝承認通知） -->
+  <% if @my_application.present? %>
+    <div class="card">
+      <h2 class="h2">あなたの申請状況</h2>
+
+      <p style="margin: 0 0 10px;">
+        状態：
+        <strong>
+          <%= I18n.t("enums.match_application.status.#{@my_application.status}", default: @my_application.status) %>
+        </strong>
+      </p>
+
+      <% if @my_application.approved? && @match_listing.match.present? %>
+        <div style="border:1px solid #b7f5c6; background:#e6ffed; padding:12px; border-radius:12px;">
+          <div style="font-weight: 700; margin-bottom: 6px;">承認されました！</div>
+          <%= link_to "作成された試合予定を見る", match_path(@match_listing.match), class: "link" %>
+        </div>
+      <% elsif @my_application.rejected? %>
+        <p class="muted">今回は残念ながら却下となりました。</p>
+      <% elsif @my_application.canceled? %>
+        <p class="muted">申請はキャンセルされています。</p>
+      <% else %>
+        <p class="muted">募集者の確認待ちです。</p>
+      <% end %>
+
+      <div class="actions-row" style="margin-top: 12px;">
+        <%= link_to "申請一覧を見る", match_listing_match_applications_path(@match_listing), class: "btn" %>
+      </div>
+    </div>
+  <% end %>
+
   <div class="card">
     <h2 class="h2">この募集に申請する</h2>
 
-    <% if @match_listing.open? %>
+    <% if !@match_listing.open? %>
+      <p class="muted">この募集は受付終了です</p>
+      <p style="margin-top: 10px;">
+        <%= link_to "申請一覧を見る", match_listing_match_applications_path(@match_listing), class: "btn" %>
+      </p>
+
+    <% elsif current_user && @match_listing.owner == current_user %>
+      <p class="muted">あなたは募集者のため申請できません。</p>
+      <p style="margin-top: 10px;">
+        <%= link_to "申請一覧を見る", match_listing_match_applications_path(@match_listing), class: "btn" %>
+      </p>
+
+    <% elsif @my_application.present? %>
+      <p class="muted">すでに申請済みです。</p>
+      <p style="margin-top: 10px;">
+        <%= link_to "申請一覧を見る", match_listing_match_applications_path(@match_listing), class: "btn" %>
+      </p>
+
+    <% else %>
       <%= form_with model: [@match_listing, MatchApplication.new], local: true do |f| %>
         <div style="margin-bottom: 12px;">
           <%= f.label :message, "メッセージ（任意）", class: "label" %><br>
@@ -55,11 +106,6 @@
           <%= link_to "申請一覧を見る", match_listing_match_applications_path(@match_listing), class: "btn" %>
         </div>
       <% end %>
-    <% else %>
-      <p class="muted">この募集は受付終了です</p>
-      <p style="margin-top: 10px;">
-        <%= link_to "申請一覧を見る", match_listing_match_applications_path(@match_listing), class: "btn" %>
-      </p>
     <% end %>
   </div>
 
