@@ -1,0 +1,27 @@
+<h1><%= @gym.name %></h1>
+
+<p><strong>エリア：</strong><%= @gym.area.presence || "未登録" %></p>
+<p><strong>住所：</strong><%= @gym.address.presence || "未登録" %></p>
+
+<% if @gym.notes.present? %>
+  <hr>
+  <p><strong>補足</strong></p>
+  <p><%= simple_format(@gym.notes) %></p>
+<% end %>
+
+<hr>
+
+<div style="display:flex; gap:10px; flex-wrap:wrap;">
+  <% if @gym.reservation_url.present? %>
+    <%= link_to "公式で予約", @gym.reservation_url, target: "_blank", rel: "noopener", class: "btn" %>
+  <% end %>
+
+  <% url = @gym.availability_url.presence || @gym.reservation_url %>
+  <% if url.present? %>
+    <%= link_to "空き確認", url, target: "_blank", rel: "noopener", class: "btn" %>
+  <% end %>
+</div>
+
+<p style="margin-top:16px;">
+  <%= link_to "検索へ戻る", gyms_path(q: params[:q]) %>
+</p>
