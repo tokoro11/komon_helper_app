@@ -1,170 +1,209 @@
-<h1>マイページ</h1>
+<%# ========= ローカルstyle定義（必ず最上部） ========= %>
+<% btn_style = "display:inline-block; padding:8px 10px; border:1px solid #ddd; border-radius:10px; text-decoration:none; background:#fff;" %>
+<% btn_style_primary = "display:inline-block; padding:8px 10px; border:1px solid #111; background:#111; color:#fff; border-radius:10px; text-decoration:none;" %>
+<% link_style = "color:#2563eb; text-decoration:none;" %>
+<% th_style = "border-bottom:1px solid #ddd; text-align:left; padding:8px; background:#fafafa;" %>
+<% td_style = "border-bottom:1px solid #eee; padding:8px;" %>
 
-<h2>未読通知</h2>
-<% if @unread_notifications.any? %>
-  <ul class="notifications">
-    <% @unread_notifications.each do |n| %>
-      <li class="notification unread">
-        <strong><%= n.title %></strong>
-        <div><%= n.body %></div>
-        <small><%= n.created_at.in_time_zone("Tokyo").strftime("%Y/%m/%d %H:%M") %></small>
-      </li>
+<div style="max-width: 1100px; margin: 0 auto; padding: 16px;">
+
+  <%# ========= ヘッダー ========= %>
+  <div style="border:1px solid #eee; border-radius: 12px; padding: 16px; margin-bottom: 14px;">
+    <h1 style="margin: 0;">マイページ</h1>
+
+    <div style="margin-top: 10px; display:flex; gap: 10px; flex-wrap: wrap;">
+      <%= link_to "募集を探す", match_listings_path, style: btn_style %>
+      <%= link_to "募集を作る", new_match_listing_path, style: btn_style_primary %>
+      <%= link_to "体育館を探す", gyms_path, style: btn_style %>
+      <%= link_to "通知一覧", notifications_path, style: btn_style %>
+    </div>
+  </div>
+
+  <%# ========= 上段：未読通知 / 申請ステータス ========= %>
+  <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; margin-bottom: 14px;">
+
+    <div style="border:1px solid #eee; border-radius:12px; padding: 14px;">
+      <div style="display:flex; align-items:center; justify-content: space-between; gap: 10px;">
+        <h2 style="margin:0; font-size:16px;">未読通知</h2>
+        <%= link_to "一覧へ", notifications_path, style: link_style %>
+      </div>
+
+      <% if @unread_notifications.any? %>
+        <ul style="margin: 10px 0 0; padding-left: 18px;">
+          <% @unread_notifications.first(5).each do |n| %>
+            <li style="margin-bottom: 8px;">
+              <div style="font-weight: 700;"><%= n.title %></div>
+              <div style="color:#555;"><%= n.body %></div>
+              <div style="color:#888; font-size: 12px;">
+                <%= n.created_at.in_time_zone("Tokyo").strftime("%Y/%m/%d %H:%M") %>
+              </div>
+            </li>
+          <% end %>
+        </ul>
+
+        <% if @unread_notifications.size > 5 %>
+          <p style="margin: 8px 0 0; color:#666; font-size:12px;">
+            他 <%= @unread_notifications.size - 5 %> 件あります
+          </p>
+        <% end %>
+      <% else %>
+        <p style="margin: 10px 0 0; color:#666;">未読通知はありません。</p>
+      <% end %>
+    </div>
+
+    <div style="border:1px solid #eee; border-radius:12px; padding: 14px;">
+      <h2 style="margin:0; font-size:16px;">申請ステータス</h2>
+
+      <div style="margin-top: 10px; display:grid; gap: 8px;">
+        <div style="display:flex; justify-content:space-between;">
+          <span style="color:#555;">申請中（返事待ち）</span>
+          <strong><%= @pending_applications.size %></strong>
+        </div>
+        <div style="display:flex; justify-content:space-between;">
+          <span style="color:#555;">承認済み（今後の試合）</span>
+          <strong><%= @approved_applications.size %></strong>
+        </div>
+        <div style="display:flex; justify-content:space-between;">
+          <span style="color:#555;">履歴（却下・キャンセル）</span>
+          <strong><%= @history_applications.size %></strong>
+        </div>
+      </div>
+
+      <p style="margin: 12px 0 0;">
+        <%= link_to "申請一覧へ", match_applications_path, style: link_style %>
+      </p>
+    </div>
+
+  </div>
+
+  <%# ========= 自分の募集（今後） ========= %>
+  <div style="border:1px solid #eee; border-radius:12px; padding: 14px; margin-bottom: 14px;">
+    <div style="display:flex; align-items:center; justify-content: space-between; gap: 10px;">
+      <h2 style="margin:0; font-size:16px;">自分の募集（今後）</h2>
+      <%= link_to "募集を作る", new_match_listing_path, style: btn_style_primary %>
+    </div>
+
+    <% if @my_upcoming_listings.any? %>
+      <div style="overflow:auto; margin-top: 10px;">
+        <table style="width:100%; border-collapse: collapse; min-width: 860px;">
+          <thead>
+            <tr>
+              <th style="<%= th_style %>">日付</th>
+              <th style="<%= th_style %>">時間</th>
+              <th style="<%= th_style %>">体育館</th>
+              <th style="<%= th_style %>">カテゴリ</th>
+              <th style="<%= th_style %>">状態</th>
+              <th style="<%= th_style %>">未処理</th>
+              <th style="<%= th_style %>">操作</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <% @my_upcoming_listings.each do |listing| %>
+              <% pending_count = listing.match_applications.count { |a| a.status == "pending" } %>
+
+              <tr>
+                <td style="<%= td_style %>"><%= listing.match_date.strftime("%Y/%m/%d") %></td>
+                <td style="<%= td_style %>"><%= listing.start_time.strftime("%H:%M") %> - <%= listing.end_time.strftime("%H:%M") %></td>
+                <td style="<%= td_style %>"><%= listing.gym&.name %></td>
+                <td style="<%= td_style %>">
+                  <%= I18n.t("enums.match_listing.gender_category.#{listing.gender_category}") %> /
+                  <%= I18n.t("enums.match_listing.school_category.#{listing.school_category}") %>
+                </td>
+                <td style="<%= td_style %>"><%= I18n.t("enums.match_listing.status.#{listing.status}") %></td>
+                <td style="<%= td_style %>"><%= pending_count %></td>
+
+                <td style="<%= td_style %>; white-space:nowrap;">
+                  <%= link_to "詳細", match_listing_path(listing), style: link_style %> |
+                  <%= link_to "編集", edit_match_listing_path(listing), style: link_style %> |
+                  <%= link_to "申請一覧", match_listing_match_applications_path(listing), style: link_style %>
+                  <% if listing.match.present? %>
+                    | <%= link_to "作成された試合", match_path(listing.match), style: link_style %>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <p style="margin: 10px 0 0; color:#666;">今後の募集はありません。</p>
     <% end %>
-  </ul>
+  </div>
 
-  <p style="margin-top: 8px;">
-    <%= link_to "通知一覧を見る", notifications_path, style: "color:#2563eb;" %>
-  </p>
-<% else %>
-  <p>未読通知はありません。</p>
-  <p style="margin-top: 8px;">
-    <%= link_to "通知一覧を見る", notifications_path, style: "color:#2563eb;" %>
-  </p>
-<% end %>
+  <%# ========= 自分の募集（過去） ========= %>
+  <div style="border:1px solid #eee; border-radius:12px; padding: 14px; margin-bottom: 14px;">
+    <h2 style="margin:0; font-size:16px;">自分の募集（過去）</h2>
 
-<hr style="margin: 18px 0; border:0; border-top:1px solid #eee;">
+    <% if @my_past_listings.any? %>
+      <div style="overflow:auto; margin-top: 10px;">
+        <table style="width:100%; border-collapse: collapse; min-width: 820px;">
+          <thead>
+            <tr>
+              <th style="<%= th_style %>">日付</th>
+              <th style="<%= th_style %>">時間</th>
+              <th style="<%= th_style %>">体育館</th>
+              <th style="<%= th_style %>">カテゴリ</th>
+              <th style="<%= th_style %>">状態</th>
+              <th style="<%= th_style %>">申請数</th>
+              <th style="<%= th_style %>">操作</th>
+            </tr>
+          </thead>
 
-<h2>自分の募集一覧（今後）</h2>
-<% if @my_upcoming_listings.any? %>
-  <table style="width:100%; border-collapse: collapse;">
-    <thead>
-      <tr>
-        <th style="border-bottom:1px solid #ddd; text-align:left; padding:8px;">日付</th>
-        <th style="border-bottom:1px solid #ddd; text-align:left; padding:8px;">時間</th>
-        <th style="border-bottom:1px solid #ddd; text-align:left; padding:8px;">体育館</th>
-        <th style="border-bottom:1px solid #ddd; text-align:left; padding:8px;">カテゴリ</th>
-        <th style="border-bottom:1px solid #ddd; text-align:left; padding:8px;">状態</th>
-        <th style="border-bottom:1px solid #ddd; text-align:left; padding:8px;">未処理</th>
-        <th style="border-bottom:1px solid #ddd; text-align:left; padding:8px;">操作</th>
-      </tr>
-    </thead>
+          <tbody>
+            <% @my_past_listings.each do |listing| %>
+              <tr>
+                <td style="<%= td_style %>"><%= listing.match_date.strftime("%Y/%m/%d") %></td>
+                <td style="<%= td_style %>"><%= listing.start_time.strftime("%H:%M") %> - <%= listing.end_time.strftime("%H:%M") %></td>
+                <td style="<%= td_style %>"><%= listing.gym&.name %></td>
+                <td style="<%= td_style %>">
+                  <%= I18n.t("enums.match_listing.gender_category.#{listing.gender_category}") %> /
+                  <%= I18n.t("enums.match_listing.school_category.#{listing.school_category}") %>
+                </td>
+                <td style="<%= td_style %>"><%= I18n.t("enums.match_listing.status.#{listing.status}") %></td>
+                <td style="<%= td_style %>"><%= listing.match_applications.size %></td>
 
-    <tbody>
-      <% @my_upcoming_listings.each do |listing| %>
-        <% pending_count = listing.match_applications.count { |a| a.status == "pending" } %>
-
-        <tr>
-          <td style="border-bottom:1px solid #eee; padding:8px;">
-            <%= listing.match_date.strftime("%Y/%m/%d") %>
-          </td>
-
-          <td style="border-bottom:1px solid #eee; padding:8px;">
-            <%= listing.start_time.strftime("%H:%M") %> - <%= listing.end_time.strftime("%H:%M") %>
-          </td>
-
-          <td style="border-bottom:1px solid #eee; padding:8px;">
-            <%= listing.gym&.name %>
-          </td>
-
-          <td style="border-bottom:1px solid #eee; padding:8px;">
-            <%= I18n.t("enums.match_listing.gender_category.#{listing.gender_category}") %>
-            /
-            <%= I18n.t("enums.match_listing.school_category.#{listing.school_category}") %>
-          </td>
-
-          <td style="border-bottom:1px solid #eee; padding:8px;">
-            <%= I18n.t("enums.match_listing.status.#{listing.status}") %>
-          </td>
-
-          <td style="border-bottom:1px solid #eee; padding:8px;">
-            <%= pending_count %>
-          </td>
-
-          <td style="border-bottom:1px solid #eee; padding:8px; white-space:nowrap;">
-            <%= link_to "詳細", match_listing_path(listing), style: "color:#2563eb;" %>
-            |
-            <%= link_to "編集", edit_match_listing_path(listing), style: "color:#2563eb;" %>
-            |
-            <%= link_to "申請一覧", match_listing_match_applications_path(listing), style: "color:#2563eb;" %>
-
-            <% if listing.match.present? %>
-              | <%= link_to "作成された試合", match_path(listing.match), style: "color:#2563eb;" %>
+                <td style="<%= td_style %>; white-space:nowrap;">
+                  <%= link_to "詳細", match_listing_path(listing), style: link_style %>
+                  <% if listing.match.present? %>
+                    | <%= link_to "作成された試合", match_path(listing.match), style: link_style %>
+                  <% end %>
+                </td>
+              </tr>
             <% end %>
-          </td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
-<% else %>
-  <p>今後の募集はありません。</p>
-<% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <p style="margin: 10px 0 0; color:#666;">過去の募集はありません。</p>
+    <% end %>
+  </div>
 
-<hr style="margin: 18px 0; border:0; border-top:1px solid #eee;">
+  <%# ========= 申請テーブル（renderそのまま） ========= %>
+  <div style="display:grid; grid-template-columns: 1fr; gap: 12px;">
+    <div style="border:1px solid #eee; border-radius:12px; padding:14px;">
+      <h2 style="margin:0; font-size:16px;">申請中（返事待ち）</h2>
+      <div style="margin-top: 8px;">
+        <%= render "applications_table", apps: @pending_applications %>
+      </div>
+    </div>
 
-<h2>自分の募集一覧（過去）</h2>
-<% if @my_past_listings.any? %>
-  <table style="width:100%; border-collapse: collapse;">
-    <thead>
-      <tr>
-        <th style="border-bottom:1px solid #ddd; text-align:left; padding:8px;">日付</th>
-        <th style="border-bottom:1px solid #ddd; text-align:left; padding:8px;">時間</th>
-        <th style="border-bottom:1px solid #ddd; text-align:left; padding:8px;">体育館</th>
-        <th style="border-bottom:1px solid #ddd; text-align:left; padding:8px;">カテゴリ</th>
-        <th style="border-bottom:1px solid #ddd; text-align:left; padding:8px;">状態</th>
-        <th style="border-bottom:1px solid #ddd; text-align:left; padding:8px;">申請数</th>
-        <th style="border-bottom:1px solid #ddd; text-align:left; padding:8px;">操作</th>
-      </tr>
-    </thead>
+    <div style="border:1px solid #eee; border-radius:12px; padding:14px;">
+      <h2 style="margin:0; font-size:16px;">承認済み（今後の試合）</h2>
+      <div style="margin-top: 8px;">
+        <%= render "applications_table", apps: @approved_applications %>
+      </div>
+    </div>
 
-    <tbody>
-      <% @my_past_listings.each do |listing| %>
-        <tr>
-          <td style="border-bottom:1px solid #eee; padding:8px;">
-            <%= listing.match_date.strftime("%Y/%m/%d") %>
-          </td>
+    <div style="border:1px solid #eee; border-radius:12px; padding:14px;">
+      <h2 style="margin:0; font-size:16px;">申請履歴（却下・キャンセル）</h2>
+      <div style="margin-top: 8px;">
+        <%= render "applications_table", apps: @history_applications %>
+      </div>
+    </div>
+  </div>
 
-          <td style="border-bottom:1px solid #eee; padding:8px;">
-            <%= listing.start_time.strftime("%H:%M") %> - <%= listing.end_time.strftime("%H:%M") %>
-          </td>
-
-          <td style="border-bottom:1px solid #eee; padding:8px;">
-            <%= listing.gym&.name %>
-          </td>
-
-          <td style="border-bottom:1px solid #eee; padding:8px;">
-            <%= I18n.t("enums.match_listing.gender_category.#{listing.gender_category}") %>
-            /
-            <%= I18n.t("enums.match_listing.school_category.#{listing.school_category}") %>
-          </td>
-
-          <td style="border-bottom:1px solid #eee; padding:8px;">
-            <%= I18n.t("enums.match_listing.status.#{listing.status}") %>
-          </td>
-
-          <td style="border-bottom:1px solid #eee; padding:8px;">
-            <%= listing.match_applications.size %>
-          </td>
-
-          <td style="border-bottom:1px solid #eee; padding:8px; white-space:nowrap;">
-            <%= link_to "詳細", match_listing_path(listing), style: "color:#2563eb;" %>
-
-            <% if listing.match.present? %>
-              | <%= link_to "作成された試合", match_path(listing.match), style: "color:#2563eb;" %>
-            <% end %>
-          </td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
-<% else %>
-  <p>過去の募集はありません。</p>
-<% end %>
-
-<hr style="margin: 18px 0; border:0; border-top:1px solid #eee;">
-
-<h2>申請中（返事待ち）</h2>
-<%= render "applications_table", apps: @pending_applications %>
-
-<hr style="margin: 18px 0; border:0; border-top:1px solid #eee;">
-
-<h2>承認済み（今後の試合）</h2>
-<%= render "applications_table", apps: @approved_applications %>
-
-<hr style="margin: 18px 0; border:0; border-top:1px solid #eee;">
-
-<h2>申請履歴（却下・キャンセル）</h2>
-<%= render "applications_table", apps: @history_applications %>
-
-<p style="margin-top: 12px;">
-  <%= link_to "試合マッチング募集を探す", match_listings_path, style: "color:#2563eb;" %>
-</p>
+  <p style="margin-top: 14px;">
+    <%= link_to "試合マッチング募集を探す", match_listings_path, style: link_style %>
+  </p>
+</div>

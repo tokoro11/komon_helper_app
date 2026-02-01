@@ -2,8 +2,7 @@ class MatchListingsController < ApplicationController
   before_action :set_match_listing, only: %i[show edit update destroy]
   before_action :authorize_owner!, only: %i[edit update destroy]
 
-  # ✅ 所属未設定ならプロフィールへ（募集の作成/編集だけ）
-  before_action :authenticate_user!, only: %i[new create edit update destroy]
+  before_action :authenticate_user!
   before_action :require_affiliation!, only: %i[new create edit update]
 
   def index

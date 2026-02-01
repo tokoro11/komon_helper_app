@@ -2,14 +2,15 @@
 
 <h1>試合予定一覧</h1>
 
-<p><%= link_to "試合予定を作成", new_match_path %></p>
+<p>
+  <%= link_to "試合予定を作成", new_match_path, style: "color:#2563eb;" %>
+</p>
 
 <table style="width: 100%; border-collapse: collapse;">
   <thead>
     <tr>
       <th style="border-bottom: 1px solid #ddd; text-align: left; padding: 8px;">日時</th>
-      <th style="border-bottom: 1px solid #ddd; text-align: left; padding: 8px;">自チーム</th>
-      <th style="border-bottom: 1px solid #ddd; text-align: left; padding: 8px;">対戦相手</th>
+      <th style="border-bottom: 1px solid #ddd; text-align: left; padding: 8px;">カード</th>
       <th style="border-bottom: 1px solid #ddd; text-align: left; padding: 8px;">会場</th>
       <th style="border-bottom: 1px solid #ddd; padding: 8px;"></th>
     </tr>
@@ -19,25 +20,25 @@
     <% @matches.each do |match| %>
       <tr>
         <td style="border-bottom: 1px solid #eee; padding: 8px;">
-          <%= match.starts_at&.in_time_zone("Tokyo")&.strftime("%Y-%m-%d %H:%M") %>
+          <%= match.starts_at&.in_time_zone("Tokyo")&.strftime("%Y/%m/%d %H:%M") || "未設定" %>
         </td>
 
         <td style="border-bottom: 1px solid #eee; padding: 8px;">
-          <%= match.team_a_name.presence || "未設定" %>
+          <strong><%= match.display_title %></strong>
         </td>
 
         <td style="border-bottom: 1px solid #eee; padding: 8px;">
-          <%= match.team_b_name.presence || "未設定" %>
+          <%= match.gym&.name.presence || "未設定" %>
         </td>
 
-        <td style="border-bottom: 1px solid #eee; padding: 8px;">
-          <%= match.gym&.name || "未設定" %>
-        </td>
-
-        <td style="border-bottom: 1px solid #eee; padding: 8px;">
-          <%= link_to "詳細", match_path(match) %>
+        <td style="border-bottom: 1px solid #eee; padding: 8px; white-space:nowrap;">
+          <%= link_to "詳細", match_path(match), style: "color:#2563eb;" %>
         </td>
       </tr>
     <% end %>
   </tbody>
 </table>
+
+<% if @matches.blank? %>
+  <p style="margin-top:12px;">試合予定はまだありません。</p>
+<% end %>
