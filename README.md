@@ -29,20 +29,24 @@
 ---
 
 ## アプリのスクリーンショット
-※ 画像は後で差し替えてください
 
 - ログイン画面  
-  `![login](docs/images/login.png)`
+  ![login](docs/images/login.png)
+
 - ホーム画面（未ログインで閲覧可）  
-  `![home](docs/images/home.png)`
+  ![home](docs/images/home.png)
+
 - マイページ  
-  `![mypage](docs/images/mypage.png)`
+  ![mypage](docs/images/mypage.png)
+
 - 練習試合募集一覧 / 詳細  
-  `![match_listings](docs/images/match_listings.png)`
+  ![match_listings](docs/images/match_listings.png)
+
 - 申請一覧（承認 / 却下）  
-  `![match_applications](docs/images/match_applications.png)`
+  ![match_applications](docs/images/match_applications.png)
+
 - 体育館検索（あいまい検索）  
-  `![gyms](docs/images/gyms.png)`
+  ![gyms](docs/images/gyms.png)
 
 ---
 
@@ -104,7 +108,7 @@
 - **Gym検索のMVP設計**
   - 候補提示＋公式予約ページ誘導にスコープを絞り、最短で価値提供できる形にした
 - **Git運用**
-  - 機能単位で feature ブランチを作成し、コミットを分割して管理
+  - 機能単位で feature ブランチを作成し、PRを通して main にマージ
 
 ---
 
@@ -119,11 +123,9 @@
 
 ---
 
-## ER図
+## ER図（MVP構成）
 
-※ 画像を配置してください
-
-`![ERD](docs/images/erd.png)`
+![ERD](docs/images/erd.png)
 
 ### 主なテーブル
 - users（顧問・コーチ）
@@ -132,6 +134,8 @@
 - match_listings（練習試合募集）
 - match_applications（募集への申請）
 - matches（成立した試合）
+
+※ 本ER図は、現在実装されているMVP機能に基づいた構成です。
 
 ---
 
