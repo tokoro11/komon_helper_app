@@ -1,16 +1,5 @@
-<p style="color: green"><%= notice %></p>
-
 <%= render @booking %>
 
 <div>
   <%= link_to "編集", edit_booking_path(@booking) %> |
   <%= link_to "一覧へ戻る", bookings_path %>
-
-  <%= button_to "削除", @booking, method: :delete, data: { turbo_confirm: "削除してよいですか？" } %>
-</div>
-<div style="display:flex; gap: 8px; margin-top: 12px;">
-  <%= button_to "承認", approve_booking_path(@booking), method: :patch %>
-  <%= button_to "却下", reject_booking_path(@booking), method: :patch %>
-  <%= button_to "キャンセル", cancel_booking_path(@booking), method: :patch %>
-</div>
-

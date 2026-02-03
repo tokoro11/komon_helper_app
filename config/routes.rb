@@ -1,6 +1,9 @@
 Rails.application.routes.draw do
   # Devise（ログイン/登録）
-  devise_for :users, controllers: { sessions: "users/sessions" }
+  devise_for :users, controllers: {
+    sessions: "users/sessions",
+    registrations: "users/registrations"
+  }
 
   # ゲストログイン
   devise_scope :user do

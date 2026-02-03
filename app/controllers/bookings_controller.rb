@@ -34,7 +34,7 @@ class BookingsController < ApplicationController
     @booking.status = :pending
 
     if @booking.save
-      redirect_to @booking, notice: "体育館使用を申請しました"
+      redirect_to @booking, notice: "体育館使用予定を作成しました"
     else
       render :new, status: :unprocessable_entity
     end

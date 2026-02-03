@@ -7,6 +7,7 @@
     <p><%= f.label :email %></p>
     <p><%= f.email_field :email, autofocus: true, autocomplete: "email" %></p>
   </div>
+
   <div class="field">
     <%= f.label :role, "役割" %><br />
     <%= f.select :role,
@@ -15,9 +16,25 @@
           .map { |k| [I18n.t("enums.user.role.#{k}"), k] } %>
   </div>
 
+  <!-- ✅ 追加：名前 -->
   <div class="field">
-    <%= f.label :affiliation, "所属（例：〇〇高校バレー部）" %><br />
-    <%= f.text_field :affiliation, autofocus: true, autocomplete: "organization" %>
+    <%= f.label :name, "名前" %><br />
+    <%= f.text_field :name, placeholder: "例：山田太郎", autocomplete: "name" %>
+  </div>
+
+  <!-- ✅ 修正：所属は「高校」だけ -->
+  <div class="field">
+    <%= f.label :affiliation, "所属（例：〇〇高校）" %><br />
+    <%= f.text_field :affiliation, placeholder: "例：山田高校", autocomplete: "organization" %>
+  </div>
+
+  <!-- ✅ 追加：チーム名（仮想属性） -->
+  <div class="field">
+    <%= f.label :team_name, "チーム名（例：〇〇高校バレー部）" %><br />
+    <%= f.text_field :team_name, placeholder: "例：山田高校バレー部" %>
+    <p style="font-size: 12px; color: #6b7280; margin: 4px 0 0;">
+      試合予定・募集の作成に必要です
+    </p>
   </div>
 
   <div class="field">
