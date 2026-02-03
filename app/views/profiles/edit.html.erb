@@ -17,8 +17,16 @@
   </div>
 
   <div style="margin-top: 12px;">
-    <%= f.label :affiliation, "所属（例：〇〇高校バレー部）" %><br>
+    <%= f.label :affiliation, "所属（例：〇〇高校）" %><br>
     <%= f.text_field :affiliation, placeholder: "〇〇高校バレー部" %>
+  </div>
+
+  <div style="margin-top: 12px;">
+    <%= f.label :team_name, "チーム名（例：〇〇高校バレー部）" %><br>
+    <%= f.text_field :team_name, placeholder: "例：所バレー" %>
+    <div style="font-size: 12px; color: #6b7280; margin-top: 4px;">
+      試合予定・募集の作成に必要です
+    </div>
   </div>
 
   <div style="margin-top: 16px;">
