@@ -1,85 +1,101 @@
 class BookingsController < ApplicationController
-  before_action :set_booking, only: %i[ show edit update destroy approve reject cancel ]
+  before_action :set_booking, only: %i[show edit update destroy approve reject cancel]
+  before_action :authorize_booking!, only: %i[show edit update destroy cancel]
+  before_action :require_admin!, only: %i[approve reject]
 
-  # GET /bookings or /bookings.json
+  # GET /bookings
   def index
-    @bookings = Booking.all
+    @bookings =
+      if current_user.admin?
+        Booking.includes(:user, :gym).order(created_at: :desc)
+      else
+        current_user.bookings.includes(:gym).order(created_at: :desc)
+      end
   end
 
-  # GET /bookings/1 or /bookings/1.json
+  # GET /bookings/1
   def show
   end
 
   # GET /bookings/new
   def new
-    @booking = Booking.new
+    @booking = current_user.bookings.build
+    @booking.status = :pending
   end
 
   # GET /bookings/1/edit
   def edit
+    # ここに来られるのは authorize_booking! を通った本人だけ
   end
 
-  # POST /bookings or /bookings.json
+  # POST /bookings
   def create
-    @booking = Booking.new(booking_params)
+    @booking = current_user.bookings.build(booking_params)
+    @booking.status = :pending
 
-    respond_to do |format|
-      if @booking.save
-        format.html { redirect_to @booking, notice: "Booking was successfully created." }
-        format.json { render :show, status: :created, location: @booking }
-      else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @booking.errors, status: :unprocessable_entity }
-      end
+    if @booking.save
+      redirect_to @booking, notice: "体育館使用を申請しました"
+    else
+      render :new, status: :unprocessable_entity
     end
   end
 
-  # PATCH/PUT /bookings/1 or /bookings/1.json
+  # PATCH/PUT /bookings/1
   def update
-    respond_to do |format|
-      if @booking.update(booking_params)
-        format.html { redirect_to @booking, notice: "Booking was successfully updated.", status: :see_other }
-        format.json { render :show, status: :ok, location: @booking }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @booking.errors, status: :unprocessable_entity }
-      end
+    # user_id / status は更新させない（booking_paramsに含めない）
+    if @booking.update(booking_params)
+      redirect_to @booking, notice: "予約内容を更新しました", status: :see_other
+    else
+      render :edit, status: :unprocessable_entity
     end
   end
 
-  # DELETE /bookings/1 or /bookings/1.json
+  # DELETE /bookings/1
   def destroy
     @booking.destroy!
-
-    respond_to do |format|
-      format.html { redirect_to bookings_path, notice: "Booking was successfully destroyed.", status: :see_other }
-      format.json { head :no_content }
-    end
+    redirect_to bookings_path, notice: "予約を削除しました", status: :see_other
   end
 
-    def approve
+  # PATCH /bookings/:id/approve
+  def approve
     @booking.update!(status: :approved)
     redirect_to @booking, notice: "承認しました"
   end
 
+  # PATCH /bookings/:id/reject
   def reject
     @booking.update!(status: :rejected)
     redirect_to @booking, notice: "却下しました"
   end
 
+  # PATCH /bookings/:id/cancel
   def cancel
+    # 本人だけキャンセル可（adminも可にしたいなら authorize_booking! を調整）
     @booking.update!(status: :canceled)
     redirect_to @booking, notice: "キャンセルしました"
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_booking
-      @booking = Booking.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def booking_params
-      params.require(:booking).permit(:user_id, :gym_id, :start_time, :end_time, :status, :note)
-    end
+  def set_booking
+    @booking = Booking.find(params[:id])
+  end
+
+  # ✅ user_id と status は permit しない
+  def booking_params
+    params.require(:booking).permit(:gym_id, :start_time, :end_time, :note)
+  end
+
+  # ✅ 本人 or admin だけアクセスOK
+  def authorize_booking!
+    return if current_user.admin?
+    return if @booking.user_id == current_user.id
+    redirect_to bookings_path, alert: "権限がありません"
+  end
+
+  # ✅ 承認・却下は admin のみ
+  def require_admin!
+    return if current_user.admin?
+    redirect_to bookings_path, alert: "権限がありません"
+  end
 end

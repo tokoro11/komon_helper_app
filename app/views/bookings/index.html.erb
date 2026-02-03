@@ -11,7 +11,6 @@
       <th style="border-bottom: 1px solid #ddd; text-align: left; padding: 8px;">体育館</th>
       <th style="border-bottom: 1px solid #ddd; text-align: left; padding: 8px;">開始</th>
       <th style="border-bottom: 1px solid #ddd; text-align: left; padding: 8px;">終了</th>
-      <th style="border-bottom: 1px solid #ddd; text-align: left; padding: 8px;">ステータス</th>
       <th style="border-bottom: 1px solid #ddd; padding: 8px;"></th>
     </tr>
   </thead>
@@ -23,9 +22,6 @@
       <td style="border-bottom: 1px solid #eee; padding: 8px;"><%= booking.gym&.name %></td>
       <td style="border-bottom: 1px solid #eee; padding: 8px;"><%= booking.start_time&.strftime("%Y-%m-%d %H:%M") %></td>
       <td style="border-bottom: 1px solid #eee; padding: 8px;"><%= booking.end_time&.strftime("%Y-%m-%d %H:%M") %></td>
-      <td style="border-bottom: 1px solid #eee; padding: 8px;">
-        <%= booking_status_badge(booking.status) %>
-      </td>
       <td style="border-bottom: 1px solid #eee; padding: 8px;">
         <%= link_to "詳細", booking_path(booking) %>
       </td>

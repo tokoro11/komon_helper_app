@@ -1,8 +1,4 @@
 <div id="<%= dom_id booking %>">
-  <p>
-    <strong>顧問：</strong>
-    <%= booking.user&.name %>
-  </p>
 
   <p>
     <strong>体育館：</strong>
@@ -17,11 +13,6 @@
   <p>
     <strong>終了時間：</strong>
     <%= booking.end_time&.strftime("%Y-%m-%d %H:%M") %>
-  </p>
-
-  <p>
-    <strong>ステータス：</strong>
-    <%= booking_status_badge(booking.status) %>
   </p>
 
   <p>
